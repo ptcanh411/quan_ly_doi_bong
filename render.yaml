@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: fc6h50
+    runtime: python
+    buildCommand: ""
+    startCommand: "python server.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
