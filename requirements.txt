@@ -1,0 +1,2 @@
+# All modules (http.server, sqlite3, json, urllib) use standard Python library.
+# No external pip packages required.

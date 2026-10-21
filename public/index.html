@@ -1,0 +1,3090 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_standard" name="shell-type"/>
+  <title>FC 6H Sáng Chủ Nhật — Quản lý Đóng Quỹ & Điểm Danh CLB</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .material-symbols-outlined {
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#f8fafc",
+            "surface-card": "#ffffff",
+            "surface-muted": "#f1f5f9",
+            "border-light": "#e2e8f0",
+            "primary": "#059669",
+            "primary-dark": "#047857",
+            "primary-wash": "#ecfdf5",
+            "primary-text": "#065f46",
+            "secondary": "#d97706",
+            "secondary-wash": "#fffbeb",
+            "secondary-text": "#b45309",
+            "danger": "#e11d48",
+            "danger-wash": "#fff1f2",
+            "danger-text": "#be123c",
+            "charcoal": "#0f172a",
+            "charcoal-muted": "#475569",
+            "charcoal-subtle": "#64748b"
+          },
+          borderRadius: {
+            "DEFAULT": "0.375rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2rem",
+            "gutter": "1rem",
+            "gutter-tablet": "1.5rem",
+            "gutter-desktop": "2.5rem"
+          },
+          fontFamily: {
+            sans: ['Inter', 'Plus Jakarta Sans', 'sans-serif'],
+            display: ['Space Grotesk', 'Plus Jakarta Sans', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style id="font-override-style">
+    * { font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
+    .display-font { font-family: 'Space Grotesk', sans-serif !important; }
+    .tabular-nums, table, td, th, [data-amount] { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+
+<body class="bg-[#f8fafc] text-charcoal antialiased selection:bg-primary-wash selection:text-primary-text">
+
+  <!-- ==================== HEADER & NAVIGATION (LIGHT GLASSMORPHISM) ==================== -->
+  <header class="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-border-light shadow-sm">
+    <div class="h-16 w-full px-gutter md:px-gutter-tablet lg:px-gutter-desktop max-w-[1440px] mx-auto flex items-center justify-between gap-3">
+      <!-- Brand -->
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center p-1.5 shadow-sm flex-shrink-0">
+          <img alt="6H FC Crest Logo" class="h-full w-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB97ASZDsISKo-RcxRcB1Vq5YoM5LpEbII5hhQjds19AcyFnL547u6Zd5SQdyhJQv8ZslQTZGz54qeE1IqY-7FnH914Y74cLM7PLkmcGVHU1KSwrsllhYe2BFsLXWkwNAgezv1TVDv6kL0V0RREokb8UxT47RUQny6gVmOab6SgHw9Omrmr66za9kM08RST7NrY-geILkasusX7qCQCzcujeeUijeVSwA56iqmN2F5cFIpGF5qwG8Fm"/>
+        </div>
+        <div class="flex flex-col min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-bold text-base sm:text-lg text-slate-900 tracking-tight truncate">FC 6H SÁNG CHỦ NHẬT</span>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-semibold uppercase">Sân 6h50</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            <span class="text-[11px] text-emerald-700 font-medium">Theo dõi đóng quỹ &amp; điểm danh CLB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Action Buttons & Auth Role Control -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <!-- Go to Deposit Price Selection Page (No hardcoded 100k popup) -->
+        <button onclick="goToDepositPage('')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all" type="button">
+          <span class="material-symbols-outlined text-[18px]">payments</span>
+          <span>+ Đóng Quỹ</span>
+        </button>
+
+        <!-- Admin-only quick buttons -->
+        <button onclick="openAddMatchModal()" class="admin-only-el hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold text-xs sm:text-sm border border-emerald-200 transition-all" type="button">
+          <span class="material-symbols-outlined text-[18px]">sports_soccer</span>
+          <span>+ Tạo trận</span>
+        </button>
+
+        <button onclick="saveAllChanges()" id="btnGlobalSave" class="admin-only-el hidden inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all" type="button">
+          <span class="material-symbols-outlined text-[17px]">save</span>
+          <span id="btnSaveText">Lưu</span>
+        </button>
+
+        <button onclick="openZaloModal()" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition-all" type="button">
+          <span class="material-symbols-outlined text-[17px]">share</span>
+          <span>Báo cáo Zalo</span>
+        </button>
+
+        <!-- USER / ADMIN LOGIN BADGE -->
+        <div class="flex items-center gap-1.5 pl-2 border-l border-slate-200">
+          <div id="authStatusBadge" onclick="openLoginModal()" class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition select-none">
+            <span id="authRoleIcon" class="material-symbols-outlined text-[18px] text-slate-600">person</span>
+            <div class="flex flex-col text-left">
+              <span id="authRoleTitle" class="text-xs font-bold text-slate-800 leading-none">Thành viên</span>
+              <span id="authRoleSub" class="text-[10px] text-slate-500 leading-none mt-0.5">Bấm để đổi quyền</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-nav Tabs -->
+    <div class="w-full bg-slate-50/90 border-t border-slate-200/80">
+      <div class="w-full px-gutter md:px-gutter-tablet lg:px-gutter-desktop max-w-[1440px] mx-auto overflow-x-auto no-scrollbar">
+        <nav class="flex items-center gap-1 py-1.5 text-xs sm:text-sm font-medium">
+          <button onclick="switchTab('matrix')" id="tabBtnMatrix" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold shadow-xs transition-all">
+            Bảng theo dõi đóng tiền (Sheets)
+          </button>
+          <button onclick="switchTab('deposits')" id="tabBtnDeposits" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all flex items-center gap-1">
+            <span>Chọn mức đóng quỹ &amp; Lịch sử</span>
+            <span id="pendingDepositsBadge" class="hidden px-1.5 py-0.2 rounded-full bg-rose-600 text-white text-[10px] font-extrabold">0</span>
+          </button>
+          <button onclick="switchTab('match')" id="tabBtnMatch" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all">
+            Điểm danh trận (Sân &amp; Nước)
+          </button>
+          <button onclick="switchTab('members')" id="tabBtnMembers" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all">
+            Danh sách thành viên &amp; Lịch sử
+          </button>
+          <button onclick="switchTab('schedule')" id="tabBtnSchedule" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all">
+            Lịch các trận đấu
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSPACE ==================== -->
+  <main class="w-full pt-32 pb-24 bg-[#f8fafc] min-h-screen">
+    <div class="relative w-full max-w-[1440px] mx-auto px-gutter md:px-gutter-tablet lg:px-gutter-desktop flex flex-col gap-4">
+
+      <!-- Role Banner Notification -->
+      <div id="roleNoticeBanner" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs shadow-2xs">
+        <div class="flex items-center gap-2">
+          <span id="bannerRoleBadge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold">
+            <span class="material-symbols-outlined text-[14px]">visibility</span> Chế độ Người dùng (Xem &amp; Đóng quỹ)
+          </span>
+          <span id="bannerRoleDesc" class="text-slate-600">
+            Bạn có thể xem tình trạng đóng tiền của cả đội và chọn mức giá đóng quỹ. <strong>Chỉ Admin (Thủ quỹ) mới được quyền tick xác nhận đã chuyển khoản quỹ.</strong>
+          </span>
+        </div>
+        <button onclick="openLoginModal()" id="bannerLoginBtn" class="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-1">
+          <span class="material-symbols-outlined text-[15px]">admin_panel_settings</span> Đăng nhập Admin
+        </button>
+      </div>
+
+      <!-- ==================== 1. RÚT GỌN: THANH THEO DÕI ĐÓNG QUỸ CLB (COMPACT TRACKER BAR) ==================== -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <!-- Ô 1: Đã đóng / Đủ quỹ -->
+        <div onclick="toggleDebtOnlyFilter(false); document.getElementById('filter-debt-only').checked = false;" class="bg-white rounded-xl px-4 py-3 border border-slate-200/90 shadow-2xs flex items-center justify-between cursor-pointer hover:border-emerald-300 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[22px]">how_to_reg</span>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-slate-400 uppercase">ĐÃ ĐÓNG / ĐỦ QUỸ</div>
+              <div class="flex items-baseline gap-1.5 mt-0.5">
+                <span id="kpiEnoughCount" class="text-xl font-extrabold text-emerald-700 tabular-nums">25 / 25</span>
+                <span class="text-xs text-slate-500 font-medium">thành viên</span>
+              </div>
+            </div>
+          </div>
+          <span id="kpiPaidRatio" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Đã nộp: 0 người</span>
+        </div>
+
+        <!-- Ô 2: Chưa đóng / Đang thiếu tiền -->
+        <div onclick="document.getElementById('filter-debt-only').checked = !document.getElementById('filter-debt-only').checked; toggleDebtOnlyFilter(document.getElementById('filter-debt-only').checked);" class="bg-white rounded-xl px-4 py-3 border border-slate-200/90 shadow-2xs flex items-center justify-between cursor-pointer hover:border-rose-300 transition" title="Nhấp để lọc nhanh người chưa đóng">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[22px]">notification_important</span>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-slate-400 uppercase">CHƯA ĐÓNG / ĐANG THIẾU</div>
+              <div class="flex items-baseline gap-1.5 mt-0.5">
+                <span id="kpiDebtorsCount" class="text-xl font-extrabold text-rose-600 tabular-nums">0 người</span>
+                <span id="kpiTotalDebtAmount" class="text-xs font-bold text-rose-500 tabular-nums">(0đ)</span>
+              </div>
+            </div>
+          </div>
+          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">Lọc xem</span>
+        </div>
+
+        <!-- Ô 3: Tổng quỹ CLB hiện còn -->
+        <div class="bg-white rounded-xl px-4 py-3 border border-slate-200/90 shadow-2xs flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-slate-400 uppercase">QUỸ CLB HIỆN CÒN</div>
+              <div class="flex items-baseline gap-1 mt-0.5">
+                <span id="kpiBalance" class="text-xl font-extrabold text-slate-900 tabular-nums">0</span>
+                <span class="text-xs font-bold text-emerald-700">đ</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-right text-[11px] text-slate-500 tabular-nums">
+            <div>Tổng thu: <strong id="kpiTotalPaid" class="text-amber-700">0</strong>đ</div>
+            <div>Đã chi sân/nước: <strong id="kpiTotalUsed" class="text-rose-600">0</strong>đ</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 1: BẢNG THEO DÕI ĐÓNG TIỀN & ĐIỂM DANH ==================== -->
+      <div id="tabMatrix" class="space-y-5">
+        <!-- Toolbar -->
+        <div class="bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1">
+            <!-- Quick Search -->
+            <div class="relative flex-1 min-w-[220px]">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+              <input oninput="filterMatrixBySearch(this.value)" class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-xs sm:text-sm" id="player-search-input" placeholder="Tìm tên thành viên, số áo, biệt danh..." type="text"/>
+            </div>
+
+            <!-- Filter Scope Pills -->
+            <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200 overflow-x-auto">
+              <button onclick="setMatrixFilter('all')" id="btnFilterAll" class="match-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-emerald-700 shadow-xs transition-all whitespace-nowrap" type="button">Tất cả trận</button>
+              <button onclick="setMatrixFilter('recent5')" id="btnFilterRecent5" class="match-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all whitespace-nowrap" type="button">5 trận gần nhất</button>
+              <button onclick="setMatrixFilter('recent3')" id="btnFilterRecent3" class="match-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all whitespace-nowrap" type="button">3 trận gần nhất</button>
+              <button onclick="openToggleMatchesModal()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all whitespace-nowrap flex items-center gap-1" type="button">
+                <span class="material-symbols-outlined text-[15px]">visibility_off</span> Ẩn/Hiện cột
+              </button>
+            </div>
+
+            <!-- Debt Only Switch Toggle -->
+            <label class="flex items-center gap-2 cursor-pointer select-none px-2 py-1 rounded-lg hover:bg-slate-50">
+              <input onchange="toggleDebtOnlyFilter(this.checked)" class="sr-only peer" id="filter-debt-only" type="checkbox"/>
+              <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500 relative shadow-inner"></div>
+              <span class="text-xs font-medium text-slate-600 peer-checked:text-rose-600 peer-checked:font-bold whitespace-nowrap">Chưa đóng / Âm quỹ</span>
+            </label>
+          </div>
+
+          <!-- Action Buttons Cluster -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="goToDepositPage('')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs shadow-sm transition-all" type="button">
+              <span class="material-symbols-outlined text-[16px]">payments</span>
+              <span>Chọn mức đóng quỹ</span>
+            </button>
+            <button onclick="openAddMatchModal()" class="admin-only-el hidden inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-sm transition-all" type="button">
+              <span class="material-symbols-outlined text-[16px]">add_circle</span>
+              <span>+ Trận mới</span>
+            </button>
+            <button onclick="openAddPlayerModal()" class="admin-only-el hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button">
+              <span class="material-symbols-outlined text-emerald-600 text-[16px]">person_add</span>
+              <span>+ Thành viên</span>
+            </button>
+            <button onclick="exportMatrixToExcel()" class="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button">
+              <span class="material-symbols-outlined text-[16px]">file_download</span>
+              <span>Xuất Excel</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hidden Matches Warning Banner -->
+        <div id="hiddenMatchesBanner" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-amber-600">info</span>
+            <span>Đang ẩn <strong id="bannerHiddenCount" class="font-bold">0</strong> cột trận đấu cũ. Số tiền đóng và chi của các thành viên vẫn được tính đủ 100%.</span>
+          </div>
+          <button onclick="setMatrixFilter('all')" class="text-emerald-700 font-bold underline hover:text-emerald-800 ml-3 flex-shrink-0">
+            Hiện lại tất cả
+          </button>
+        </div>
+
+        <!-- Matrix Table Card -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col">
+          <div class="p-4 bg-slate-50/80 border-b border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[20px]">grid_view</span>
+              </div>
+              <div>
+                <h2 class="text-base font-bold text-slate-900">Bảng Theo Dõi Thành Viên Đóng Tiền &amp; Điểm Danh</h2>
+                <p class="text-xs text-slate-500">Bấm nút <strong>Đóng quỹ</strong> để chọn mức tiền đóng • Bấm nút <strong>Lịch sử</strong> để xem các lần đã đóng của từng người</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-slate-600 font-medium flex-wrap">
+              <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Có mặt</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-400 inline-block"></span> Vắng</span>
+              <span id="saveStatusIndicator" class="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 font-semibold">
+                <span class="material-symbols-outlined text-[14px]">done_all</span> Đã đồng bộ
+              </span>
+            </div>
+          </div>
+
+          <div class="w-full overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[980px]">
+              <thead>
+                <tr id="matrixHeaderRow" class="bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                  <!-- Populated by JS -->
+                </tr>
+              </thead>
+              <tbody class="text-sm divide-y divide-slate-100" id="player-matrix-body">
+                <!-- Populated by JS -->
+              </tbody>
+              <tfoot id="matrixTableFoot" class="bg-slate-50/90 text-slate-900 font-bold border-t-2 border-slate-200 text-xs">
+                <!-- Populated by JS -->
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Matrix Footer Pagination -->
+          <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+            <span id="matrixFooterCountText">Hiển thị <strong class="text-slate-900 font-bold">25</strong> / 25 thành viên câu lạc bộ FC 6H</span>
+            <div class="flex items-center gap-1.5">
+              <button onclick="setMatrixPageSize('all')" id="btnPageAll" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold transition">Hiện tất cả (25)</button>
+              <button onclick="setMatrixPageSize(10)" id="btnPage10" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 font-semibold transition">Phân trang (10/trang)</button>
+              <div id="pageButtonsContainer" class="hidden flex items-center gap-1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 2 (DEPOSITS): TRANG CHỌN MỨC GIÁ ĐÓNG QUỸ & LỊCH SỬ TỪNG NGƯỜI ==================== -->
+      <section id="tabDeposits" class="hidden space-y-6">
+        <!-- Top: Select Price Tier & QR Transfer -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          
+          <!-- Left 7 Cols: Chọn Thành Viên & Chọn Mức Giá Đóng Quỹ -->
+          <div class="lg:col-span-7 bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-amber-500 text-[24px]">payments</span>
+                  Chọn Mức Giá Đóng Quỹ CLB
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">Chọn tên thành viên và mức tiền muốn đóng (không bắt buộc cố định 100k)</p>
+              </div>
+              <span id="depositPageRoleBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
+                Chế độ Thành viên
+              </span>
+            </div>
+
+            <div class="space-y-4 text-xs">
+              <!-- Bước 1: Chọn thành viên -->
+              <div>
+                <label class="block font-bold text-slate-700 mb-1.5 text-sm">1. Chọn tên thành viên đóng quỹ *</label>
+                <select id="tabDepositPlayerId" onchange="onDepositPlayerChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-bold text-slate-900 text-sm focus:border-emerald-500 focus:outline-none">
+                  <!-- populated by JS -->
+                </select>
+                <div id="selectedPlayerBalanceNotice" class="mt-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                  <!-- populated by JS -->
+                </div>
+              </div>
+
+              <!-- Bước 2: Chọn mức giá đóng quỹ -->
+              <div>
+                <label class="block font-bold text-slate-700 mb-2 text-sm">2. Chọn mức tiền muốn đóng vào quỹ *</label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="priceTierGrid">
+                  <button type="button" onclick="selectDepositTier(20000)" data-tier="20000" class="tier-card p-3 rounded-xl border border-slate-200 bg-slate-50 hover:border-emerald-500 hover:bg-emerald-50/50 text-left transition flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Mức 1 trận sân</span>
+                    <span class="text-base font-extrabold text-slate-900 mt-0.5 tabular-nums">20.000đ</span>
+                  </button>
+                  <button type="button" onclick="selectDepositTier(30000)" data-tier="30000" class="tier-card p-3 rounded-xl border border-slate-200 bg-slate-50 hover:border-emerald-500 hover:bg-emerald-50/50 text-left transition flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">1 trận Đá + Nước</span>
+                    <span class="text-base font-extrabold text-slate-900 mt-0.5 tabular-nums">30.000đ</span>
+                  </button>
+                  <button type="button" onclick="selectDepositTier(50000)" data-tier="50000" class="tier-card p-3 rounded-xl border border-slate-200 bg-slate-50 hover:border-emerald-500 hover:bg-emerald-50/50 text-left transition flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Đóng theo đợt</span>
+                    <span class="text-base font-extrabold text-slate-900 mt-0.5 tabular-nums">50.000đ</span>
+                  </button>
+                  <button type="button" onclick="selectDepositTier(100000)" data-tier="100000" class="tier-card p-3 rounded-xl border border-slate-200 bg-slate-50 hover:border-emerald-500 hover:bg-emerald-50/50 text-left transition flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Quỹ tháng (4 trận)</span>
+                    <span class="text-base font-extrabold text-slate-900 mt-0.5 tabular-nums">100.000đ</span>
+                  </button>
+                  <button type="button" onclick="selectDepositTier(200000)" data-tier="200000" class="tier-card p-3 rounded-xl border border-slate-200 bg-slate-50 hover:border-emerald-500 hover:bg-emerald-50/50 text-left transition flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Quỹ 2 tháng</span>
+                    <span class="text-base font-extrabold text-slate-900 mt-0.5 tabular-nums">200.000đ</span>
+                  </button>
+                  <button type="button" onclick="selectDepositTier(500000)" data-tier="500000" class="tier-card p-3 rounded-xl border border-slate-200 bg-slate-50 hover:border-emerald-500 hover:bg-emerald-50/50 text-left transition flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Quỹ dài hạn</span>
+                    <span class="text-base font-extrabold text-slate-900 mt-0.5 tabular-nums">500.000đ</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Bước 3: Hoặc tự nhập số tiền tùy ý -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Số tiền đóng thực tế (Tự nhập tùy ý) *</label>
+                  <div class="relative">
+                    <input type="number" id="tabDepositAmount" oninput="onCustomDepositInput()" step="5000" placeholder="Nhập số tiền bất kỳ..." class="w-full bg-white border-2 border-emerald-500 rounded-xl px-3.5 py-2 font-extrabold text-lg text-emerald-700 focus:outline-none tabular-nums"/>
+                    <span class="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400">VNĐ</span>
+                  </div>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-600 mb-1">Ghi chú &amp; Ngày đóng</label>
+                  <div class="flex gap-2">
+                    <input type="text" id="tabDepositNote" placeholder="VD: CK VietQR, Tiền mặt..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+                    <input type="date" id="tabDepositDate" class="w-36 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bước 4: Nút xác nhận (Phân quyền Admin vs Người dùng) -->
+              <div class="pt-3 border-t border-slate-100">
+                <!-- Hiển thị khi là ADMIN -->
+                <div id="adminDepositConfirmBox" class="hidden space-y-2">
+                  <label class="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-50 border border-emerald-200 cursor-pointer select-none">
+                    <input type="checkbox" id="chkAdminVerifiedTransfer" checked class="w-5 h-5 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500"/>
+                    <span class="text-xs font-bold text-emerald-900">
+                      [Quyền Admin] Tôi xác nhận thành viên này đã chuyển khoản / đóng tiền quỹ
+                    </span>
+                  </label>
+                  <button type="button" onclick="adminSubmitDeposit()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">verified</span>
+                    <span>Tick Đã Chuyển Khoản &amp; Cộng Vào Quỹ Ngay</span>
+                  </button>
+                </div>
+
+                <!-- Hiển thị khi là NGƯỜI DÙNG (THÀNH VIÊN) -->
+                <div id="userDepositNoticeBox" class="space-y-2.5">
+                  <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
+                    <span class="material-symbols-outlined text-amber-600 text-[18px] mt-0.5">lock</span>
+                    <div>
+                      <strong>Chỉ Admin (Thủ quỹ) mới được tick xác nhận đã chuyển khoản quỹ.</strong>
+                      <p class="text-[11px] text-amber-800 mt-0.5">Bạn hãy quét mã QR bên cạnh để chuyển khoản theo mức tiền đã chọn, hoặc bấm gửi báo đã chuyển khoản để Admin kiểm tra và tick duyệt.</p>
+                    </div>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="userSubmitPendingDeposit()" class="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
+                      <span class="material-symbols-outlined text-[17px]">send</span>
+                      <span>Gửi báo đã chuyển khoản (Chờ Admin tick duyệt)</span>
+                    </button>
+                    <button type="button" onclick="openLoginModal()" class="px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs rounded-xl transition flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[17px]">admin_panel_settings</span>
+                      <span>Tôi là Admin</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 5 Cols: Mã VietQR & Danh sách chờ Admin Tick duyệt -->
+          <div class="lg:col-span-5 flex flex-col gap-5">
+            <!-- QR Card -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-col justify-between flex-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold tracking-wider uppercase text-amber-700">MÃ VIETQR ĐÓNG QUỸ CLB</span>
+                <span class="text-xs text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Quét mã chuyển khoản</span>
+              </div>
+
+              <div class="my-4 flex flex-col items-center justify-center text-center">
+                <div class="p-3 bg-white border-2 border-emerald-100 rounded-2xl shadow-xs flex flex-col items-center">
+                  <img src="/qr_code.png" alt="Mã VietQR PHAM TRONG CANH" class="w-44 h-44 object-contain"/>
+                </div>
+                <div class="mt-3">
+                  <div class="text-xs text-slate-500">Số tiền đang chọn đóng:</div>
+                  <div id="liveQrSelectedAmount" class="text-2xl font-extrabold text-emerald-700 tabular-nums mt-0.5">Chưa chọn mức giá</div>
+                </div>
+                <div class="mt-2 text-xs text-slate-600">
+                  Chủ TK: <strong class="text-slate-900">PHAM TRONG CANH</strong> • STK: <strong class="text-emerald-700 font-mono">0362226752</strong>
+                </div>
+                <div class="mt-2 w-full bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex items-center justify-between text-xs font-mono">
+                  <span id="liveQrSyntaxText" class="font-bold text-emerald-800 truncate">FC6H DONG QUY</span>
+                  <button onclick="copyLiveQrSyntax()" class="text-emerald-700 hover:text-emerald-900 font-sans font-bold flex items-center gap-1 ml-2 flex-shrink-0" type="button">
+                    <span class="material-symbols-outlined text-[15px]">content_copy</span> Copy
+                  </button>
+                </div>
+              </div>
+
+              <button onclick="copyTransferInfo()" class="w-full inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs border border-slate-200 transition-all" type="button">
+                <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                <span>Sao chép STK 0362226752 &amp; Cú pháp</span>
+              </button>
+            </div>
+
+            <!-- Danh sách yêu cầu chờ Admin tick xác nhận -->
+            <div id="pendingApprovalsCard" class="bg-white rounded-2xl p-5 border border-amber-200 shadow-sm space-y-3 hidden">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[18px] text-amber-600">pending_actions</span>
+                  Chờ Admin Tick Xác Nhận Đã Chuyển Khoản
+                </h4>
+                <span id="pendingCountPill" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[11px]">0</span>
+              </div>
+              <div id="pendingApprovalsList" class="space-y-2 max-h-48 overflow-y-auto">
+                <!-- populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom: LỊCH SỬ ĐÓNG QUỸ TỪNG NGƯỜI & TẤT CẢ GIAO DỊCH -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Bảng tổng hợp đóng quỹ từng thành viên (5 cols) -->
+          <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-emerald-600 text-[19px]">group</span>
+                  Tổng Hợp Đóng Quỹ Từng Thành Viên
+                </h3>
+                <p class="text-[11px] text-slate-500">Nhấp vào tên cầu thủ để lọc lịch sử các lần đóng của riêng người đó</p>
+              </div>
+            </div>
+            <div class="overflow-y-auto max-h-[420px] divide-y divide-slate-100" id="perPlayerDepositSummaryList">
+              <!-- populated by JS -->
+            </div>
+          </div>
+
+          <!-- Bảng chi tiết từng lần đóng quỹ (7 cols) -->
+          <div class="lg:col-span-7 bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-600 text-[20px]">history</span>
+                <h3 class="text-sm font-bold text-slate-900">Chi Tiết Lịch Sử Các Lần Đóng Quỹ</h3>
+              </div>
+              <div class="flex items-center gap-2">
+                <select id="historyPlayerFilter" onchange="renderDepositHistoryList()" class="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-800 focus:border-emerald-500 focus:outline-none">
+                  <option value="ALL">Tất cả thành viên (25)</option>
+                </select>
+                <span id="tabDepositHistoryCount" class="text-xs text-slate-500 font-semibold bg-slate-100 px-2.5 py-1 rounded-full">0 lần đóng</span>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto flex-1 max-h-[420px]">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold uppercase sticky top-0">
+                  <tr>
+                    <th class="p-3">Thành viên</th>
+                    <th class="p-3 text-right">Số tiền đóng</th>
+                    <th class="p-3">Loại / Ghi chú</th>
+                    <th class="p-3">Ngày ghi nhận</th>
+                    <th class="p-3 text-center">Trạng thái</th>
+                    <th class="p-3 text-center">Xóa</th>
+                  </tr>
+                </thead>
+                <tbody id="tabDepositHistoryTable" class="divide-y divide-slate-100 text-xs sm:text-sm">
+                  <!-- populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: ĐIỂM DANH TRẬN (SÂN & NƯỚC TÁCH RIÊNG) ==================== -->
+      <section id="tabMatch" class="hidden space-y-5">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <label for="matchSelector" class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[20px] text-emerald-600">sports_soccer</span> Chọn trận đấu:
+              </label>
+              <select id="matchSelector" onchange="onSelectMatch(this.value)" class="bg-slate-50 border border-slate-200 font-bold text-slate-900 text-sm rounded-xl px-3.5 py-2 focus:border-emerald-500 focus:outline-none">
+                <!-- populated by JS -->
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <button onclick="toggleSelectAllAttendance(true)" class="admin-only-el hidden px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 transition">
+                Chọn tất cả đi đá
+              </button>
+              <button onclick="autoSplitPitchFee()" class="admin-only-el hidden px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200 flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[18px]">calculate</span> Chia đều tiền sân
+              </button>
+              <button onclick="saveCurrentMatchDetails()" class="admin-only-el hidden px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition">
+                <span class="material-symbols-outlined text-[18px]">done</span> Lưu kết quả trận
+              </button>
+            </div>
+          </div>
+
+          <!-- Pitch & Drink Fee Inputs -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200/80 text-xs">
+            <div>
+              <label class="block font-bold text-slate-600 mb-1.5 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px] text-emerald-600">stadium</span>
+                Tiền thuê sân bóng (chia đều người đá):
+              </label>
+              <div class="relative">
+                <input type="number" id="inputPitchFee" oninput="recalcMatchLive()" step="10000" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 font-bold text-sm text-slate-900 focus:border-emerald-500 focus:outline-none" placeholder="300000"/>
+                <span class="absolute right-3.5 top-2.5 text-slate-400 font-semibold">VNĐ</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-600 mb-1.5 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px] text-amber-600">local_drink</span>
+                Đơn giá nước (+10k khi tick uống nước):
+              </label>
+              <div class="relative">
+                <input type="number" id="inputDrinkPrice" oninput="recalcMatchLive()" step="5000" value="10000" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 font-bold text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+                <span class="absolute right-3.5 top-2.5 text-slate-400 font-semibold">VNĐ/người</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-600 mb-1.5 flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px] text-slate-500">event</span>
+                Ngày &amp; giờ đá (Dương lịch):
+              </label>
+              <input type="datetime-local" id="inputMatchDate" class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 font-semibold text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+            </div>
+          </div>
+
+          <!-- Live Totals Ribbon -->
+          <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-4 text-xs">
+            <div class="flex items-center gap-6 flex-wrap">
+              <span class="text-slate-600 font-medium">Đi đá: <strong id="liveAttendingCount" class="text-emerald-700 text-base font-extrabold">0</strong> người</span>
+              <span class="text-slate-600 font-medium">Uống nước: <strong id="liveDrinksCount" class="text-amber-700 text-base font-extrabold">0</strong> người</span>
+              <span class="text-slate-600 font-medium">Tổng trừ trận này: <strong id="liveTotalFee" class="text-rose-600 text-base font-extrabold">0đ</strong></span>
+              <span class="text-slate-600 font-medium">Đóng thêm tại sân: <strong id="liveTotalAdded" class="text-emerald-700 text-base font-extrabold">0đ</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attendance List -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+          <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 font-bold text-sm text-slate-900 flex justify-between items-center">
+            <span class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[19px] text-emerald-600">checklist</span>
+              Danh sách điểm danh &amp; thu tiền tại trận
+            </span>
+            <span class="text-slate-500 font-medium text-xs">
+              Tổng <span id="matchTotalPlayersCount" class="font-bold text-emerald-700">25</span> cầu thủ
+            </span>
+          </div>
+          <div id="matchAttendanceList" class="divide-y divide-slate-100">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 4: DANH SÁCH THÀNH VIÊN & LỊCH SỬ ==================== -->
+      <section id="tabMembers" class="hidden space-y-5">
+        <!-- Debtors Alert Box -->
+        <div id="debtorsSection" class="bg-rose-50/70 border border-rose-200 rounded-2xl p-5 space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h3 class="text-sm font-extrabold text-rose-800 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-rose-600 text-[20px]">warning</span>
+              THÀNH VIÊN ĐANG THIẾU / ÂM QUỸ (CẦN ĐÓNG BỔ SUNG)
+            </h3>
+            <button onclick="openZaloModal()" class="text-xs bg-rose-600 hover:bg-rose-700 text-white px-3.5 py-1.5 rounded-xl font-bold shadow-xs flex items-center gap-1 transition">
+              <span class="material-symbols-outlined text-[15px]">send</span> Xuất tin nhắc nợ Zalo
+            </button>
+          </div>
+          <div id="debtorsListGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-slate-900 text-base">
+            Danh sách thành viên &amp; Lịch sử đóng tiền (<span id="membersTotalCount">25</span>)
+          </h3>
+          <button onclick="openAddPlayerModal()" class="admin-only-el hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs shadow-sm flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[17px]">person_add</span> Thêm thành viên mới
+          </button>
+        </div>
+
+        <div id="membersCardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <!-- populated by JS -->
+        </div>
+      </section>
+
+      <!-- ==================== TAB 5: LỊCH CÁC TRẬN ĐẤU ==================== -->
+      <section id="tabSchedule" class="hidden space-y-4">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-600 text-[22px]">calendar_month</span>
+              Quản lý lịch thi đấu Chủ Nhật hàng tuần
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Quy tắc an toàn: Hệ thống tự động chặn không cho tạo 2 trận trùng cùng ngày và khung giờ đá.
+            </p>
+          </div>
+          <button onclick="openAddMatchModal()" class="admin-only-el hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-sm flex items-center gap-1.5 transition">
+            <span class="material-symbols-outlined text-[17px]">add_circle</span> + Tạo trận Chủ Nhật mới
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 uppercase font-bold">
+                <tr>
+                  <th class="p-4">Tên trận</th>
+                  <th class="p-4">Ngày &amp; Giờ đá</th>
+                  <th class="p-4">Địa điểm sân</th>
+                  <th class="p-4 text-center">Số người đá</th>
+                  <th class="p-4 text-right">Tiền sân</th>
+                  <th class="p-4 text-center">Trạng thái</th>
+                  <th class="p-4 text-center">Hiển thị trên Bảng</th>
+                  <th class="p-4 text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleTableBody" class="divide-y divide-slate-100 text-sm">
+                <!-- populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==================== FLOATING BOTTOM STATUS DOCK ==================== -->
+  <aside aria-label="Khung điều khiển nhanh" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[92%] max-w-[1080px] z-40 rounded-2xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-xl px-5 py-2.5 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-5">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-200"></span>
+        <span class="font-bold text-xs sm:text-sm text-slate-900">FC 6H SÁNG</span>
+      </div>
+      <div class="hidden md:flex items-center gap-4 text-xs text-slate-500 font-medium">
+        <span>Thành viên: <strong id="dockTotalPlayers" class="text-slate-800">25</strong></span>
+        <span class="text-slate-300">|</span>
+        <span>Trận tới: <strong id="dockAttendingCount" class="text-emerald-700 font-bold">0 Có mặt</strong></span>
+        <span class="text-slate-300">|</span>
+        <span>Quỹ còn: <strong id="dockNetBalance" class="text-slate-900 font-bold tabular-nums">0đ</strong></span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="goToDepositPage('')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold text-xs transition" type="button">
+        <span class="material-symbols-outlined text-[15px] text-amber-600">payments</span>
+        <span>Đóng quỹ</span>
+      </button>
+      <button onclick="openZaloModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs shadow-xs active:scale-95 transition-all" id="btn-floating-debt-alert" type="button">
+        <span class="material-symbols-outlined text-[15px] text-rose-600">notifications_active</span>
+        <span id="dockDebtBtnText">⚡ Nhắc nợ Zalo</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ==================== MODAL: ĐĂNG NHẬP NGƯỜI DÙNG & ADMIN ==================== -->
+  <div id="modalLogin" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
+    <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">shield_person</span>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Đăng nhập &amp; Chọn Quyền Sử Dụng</h3>
+            <p class="text-xs text-slate-500">Phân quyền Người dùng (Thành viên) &amp; Admin (Thủ quỹ)</p>
+          </div>
+        </div>
+        <button onclick="closeLoginModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <!-- Mode Switch Tabs inside Modal -->
+      <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+        <button type="button" onclick="switchLoginModalTab('user')" id="loginTabUser" class="py-2 rounded-lg text-xs font-bold bg-white text-emerald-700 shadow-xs transition">
+          👤 Người dùng (Thành viên)
+        </button>
+        <button type="button" onclick="switchLoginModalTab('admin')" id="loginTabAdmin" class="py-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+          🛡️ Admin (Thủ quỹ)
+        </button>
+      </div>
+
+      <!-- Panel 1: User Login -->
+      <div id="loginPanelUser" class="space-y-4 text-xs">
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 leading-relaxed">
+          Chế độ <strong>Người dùng (Thành viên)</strong> giúp bạn xem bảng đóng tiền của đội, tra cứu lịch sử đóng quỹ của từng người và lấy mã QR theo mức giá. <em>(Không tự ý sửa số liệu hoặc tick đã chuyển khoản)</em>.
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Chọn tên của bạn trong CLB (Không bắt buộc):</label>
+          <select id="loginUserSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-bold text-slate-900 text-sm focus:border-emerald-500 focus:outline-none">
+            <option value="">-- Thành viên xem chung --</option>
+          </select>
+        </div>
+        <button type="button" onclick="handleLoginAsUser()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition">
+          Vào chế độ Thành viên
+        </button>
+      </div>
+
+      <!-- Panel 2: Admin Login -->
+      <form id="loginPanelAdmin" onsubmit="handleLoginAsAdmin(event)" class="hidden space-y-4 text-xs">
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 leading-relaxed">
+          <strong>Quyền Admin (Thủ quỹ / Đội trưởng):</strong> Được phép <strong>tick xác nhận đã chuyển khoản quỹ</strong>, cộng tiền, điểm danh chia tiền sân và quản lý thành viên.
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Tài khoản Admin</label>
+          <input type="text" id="adminUsernameInput" value="admin" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-bold text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Mật khẩu Admin *</label>
+          <input type="password" id="adminPasswordInput" placeholder="Nhập mật khẩu Admin" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm font-bold text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+        </div>
+        <p id="loginErrorText" class="text-xs text-rose-600 font-bold hidden">⚠️ Mật khẩu Admin không đúng!</p>
+        <div class="flex gap-2">
+          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-sm transition">
+            🔐 Đăng nhập Admin
+          </button>
+          <button type="button" id="btnLogoutAdmin" onclick="handleLogoutAdmin()" class="hidden px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition">
+            Đăng xuất
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: LỊCH SỬ ĐÓNG QUỸ CHI TIẾT TỪNG NGƯỜI ==================== -->
+  <div id="modalPlayerHistory" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
+    <div class="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 flex flex-col gap-4 max-h-[85vh]">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[20px]">history</span>
+          </div>
+          <div>
+            <h3 id="historyModalPlayerName" class="text-base font-bold text-slate-900">Lịch sử đóng quỹ</h3>
+            <p id="historyModalPlayerSub" class="text-xs text-slate-500">Chi tiết tất cả các lần đóng tiền &amp; tham gia trận</p>
+          </div>
+        </div>
+        <button onclick="closePlayerHistoryModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2.5 text-center bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase">TỔNG ĐÃ ĐÓNG</span>
+          <div id="historyTotalPaid" class="text-sm font-extrabold text-amber-600 mt-0.5 tabular-nums">0đ</div>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase">ĐÃ TRỪ SÂN/NƯỚC</span>
+          <div id="historyTotalUsed" class="text-sm font-extrabold text-rose-600 mt-0.5 tabular-nums">0đ</div>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase">SỐ DƯ HIỆN TẠI</span>
+          <div id="historyBalance" class="text-sm font-extrabold text-emerald-700 mt-0.5 tabular-nums">0đ</div>
+        </div>
+      </div>
+
+      <div id="historyModalContent" class="overflow-y-auto space-y-3 flex-1 pr-1 text-xs">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="flex justify-between items-center pt-2 border-t border-slate-100">
+        <button id="historyModalDepositBtn" onclick="" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1">
+          <span class="material-symbols-outlined text-[15px]">payments</span> Chọn mức đóng quỹ cho người này
+        </button>
+        <button onclick="closePlayerHistoryModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: TÙY CHỌN ẨN/HIỆN CỘT TRẬN ĐẤU ==================== -->
+  <div id="modalToggleMatches" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="rounded-2xl bg-white max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <span class="material-symbols-outlined text-emerald-600 text-[20px]">visibility</span>
+          Tùy chọn cột trận đấu hiển thị
+        </h3>
+        <button onclick="closeToggleMatchesModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-500 leading-relaxed">
+        Bỏ tick ở các trận cũ để bảng gọn gàng hơn. Số tiền của trận bị ẩn vẫn được cộng trừ chính xác 100% vào số dư thành viên.
+      </p>
+
+      <div id="matchVisibilityChecklist" class="max-h-60 overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-xl p-2 text-xs space-y-1 bg-slate-50">
+        <!-- populated by JS -->
+      </div>
+
+      <div class="flex justify-between items-center pt-3 border-t border-slate-100">
+        <button type="button" onclick="selectAllMatchesVisibility(true)" class="text-xs text-emerald-700 font-bold hover:underline">
+          Hiện tất cả
+        </button>
+        <div class="flex gap-2">
+          <button type="button" onclick="closeToggleMatchesModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs">
+            Đóng
+          </button>
+          <button type="button" onclick="applyMatchesVisibility()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-sm">
+            Áp dụng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: TẠO TRẬN MỚI ==================== -->
+  <div id="modalMatch" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="rounded-2xl bg-white max-w-sm w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+          <span class="material-symbols-outlined text-emerald-600 text-[20px]">calendar_month</span>
+          Lập lịch trận đấu mới
+        </h3>
+        <button onclick="closeMatchModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <form id="formMatch" onsubmit="handleSaveNewMatch(event)" class="space-y-3 text-xs">
+        <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-emerald-800 text-xs leading-relaxed">
+          Mặc định gợi ý <strong>Chủ Nhật tiếp theo lúc 06:00 sáng</strong>. Hệ thống tự động chặn không cho tạo 2 trận trùng ngày và giờ.
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-600 mb-1">Tên trận gợi nhớ</label>
+          <input type="text" id="newMatchTitle" placeholder="VD: Trận CN 25/10" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-600 mb-1">Ngày &amp; giờ đá (Dương lịch) *</label>
+          <input type="datetime-local" id="newMatchDate" onchange="checkMatchDuplicateWarning()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-bold text-sm text-emerald-700 focus:border-emerald-500 focus:outline-none"/>
+          <p id="duplicateWarningText" class="text-xs text-rose-600 font-bold mt-1.5 hidden"></p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Khung giờ</label>
+            <input type="text" id="newMatchTimeSlot" onchange="checkMatchDuplicateWarning()" value="06:00 - 07:30" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Sân bóng</label>
+            <input type="text" id="newMatchStadium" value="Sân bóng 6h50" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Tiền sân dự kiến</label>
+            <input type="number" id="newMatchPitchFee" value="300000" step="10000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-bold text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Giá nước/người</label>
+            <input type="number" id="newMatchDrinkFee" value="10000" step="5000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-bold text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeMatchModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition">
+            Hủy
+          </button>
+          <button type="submit" id="btnSubmitNewMatch" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-sm transition">
+            Tạo trận đấu
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: THÊM / SỬA THÀNH VIÊN ==================== -->
+  <div id="modalPlayer" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="rounded-2xl bg-white max-w-sm w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <h3 id="modalPlayerTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
+          <span class="material-symbols-outlined text-emerald-600 text-[20px]">person_add</span>
+          Thêm thành viên mới
+        </h3>
+        <button onclick="closePlayerModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <form id="formPlayer" onsubmit="handleSavePlayer(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="editPlayerId" value=""/>
+
+        <div>
+          <label class="block font-bold text-slate-600 mb-1">Họ và tên *</label>
+          <input type="text" id="inputPlayerName" required placeholder="VD: Phi Đỗ, Thành Kiên..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-600 mb-1">Vị trí / Biệt danh (nếu có)</label>
+          <input type="text" id="inputPlayerNickname" placeholder="VD: Tiền vệ (MF), Dương dê..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-600 mb-1">Số điện thoại / Zalo</label>
+          <input type="tel" id="inputPlayerPhone" placeholder="0987654321" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-mono text-sm text-slate-900 focus:border-emerald-500 focus:outline-none"/>
+        </div>
+
+        <div id="initialDepositGroup">
+          <label class="block font-bold text-slate-600 mb-1">Tiền nạp ban đầu (VNĐ)</label>
+          <input type="number" id="inputPlayerDeposit" step="10000" value="0" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 font-bold text-sm text-emerald-700 focus:border-emerald-500 focus:outline-none"/>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closePlayerModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition">
+            Hủy
+          </button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-sm transition">
+            Lưu thành viên
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: BÁO CÁO ZALO ==================== -->
+  <div id="modalZalo" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="rounded-2xl bg-white max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+          <span class="material-symbols-outlined text-amber-600 text-[20px]">share</span>
+          Báo cáo quỹ gửi nhóm Zalo
+        </h3>
+        <button onclick="closeZaloModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <textarea id="zaloReportText" rows="10" readonly class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs font-mono text-slate-800 focus:outline-none"></textarea>
+
+      <div class="flex justify-between items-center pt-2">
+        <span id="copyToast" class="text-xs text-emerald-700 font-bold opacity-0 transition-opacity flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">done</span> Đã sao chép nội dung!
+        </span>
+        <div class="flex gap-2">
+          <button onclick="closeZaloModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl">
+            Đóng
+          </button>
+          <button onclick="copyZaloText()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm">
+            Sao chép báo cáo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+  <div class="fixed top-20 right-4 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white border border-slate-200 text-slate-900 shadow-xl transition-all duration-300 transform translate-y-[-100px] opacity-0" id="toast-notification">
+    <span class="material-symbols-outlined text-emerald-600 text-[20px]" id="toast-icon">check_circle</span>
+    <span class="text-xs font-semibold" id="toast-message">Đã cập nhật trạng thái!</span>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="w-full bg-white border-t border-slate-200 py-5">
+    <div class="w-full px-gutter md:px-gutter-tablet lg:px-gutter-desktop max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-extrabold text-emerald-700">6H FC</span>
+        <span class="text-xs text-slate-500 font-medium">Sổ theo dõi đóng quỹ &amp; điểm danh CLB bóng đá Chủ Nhật</span>
+      </div>
+      <div class="flex items-center gap-4 text-xs text-slate-500 font-medium">
+        <span>Chủ TK Quỹ: <strong class="text-slate-700">PHAM TRONG CANH (0362226752)</strong></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== CLIENT INTERACTIVE JAVASCRIPT ==================== -->
+  <script>
+    let players = [];
+    let matches = [];
+    let allDeposits = [];
+    let selectedMatchId = null;
+    let pendingUpdates = {};
+    let hiddenMatchIds = new Set();
+    let matrixFilterMode = 'all';
+    let searchQuery = '';
+    let filterDebtOnly = false;
+
+    // Auth state: 'user' or 'admin'
+    let currentAuthRole = localStorage.getItem('fc6h_role') || 'user';
+    let currentLoggedUserName = localStorage.getItem('fc6h_username') || 'Thành viên';
+
+    // Pending transfer requests submitted by users waiting for Admin tick approval
+    let pendingTransferRequests = JSON.parse(localStorage.getItem('fc6h_pending_deposits') || '[]');
+
+    // Pagination state
+    let matrixPageSize = 'all';
+    let matrixCurrentPage = 1;
+
+    let clubConfig = {
+      bankCode: '970422',
+      bankAccount: '0362226752',
+      accountHolder: 'PHAM TRONG CANH'
+    };
+
+    const AVATAR_PALETTES = [
+      { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-200', badge: 'text-emerald-700' },
+      { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200', badge: 'text-blue-700' },
+      { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200', badge: 'text-purple-700' },
+      { bg: 'bg-teal-100', text: 'text-teal-800', border: 'border-teal-200', badge: 'text-teal-700' },
+      { bg: 'bg-indigo-100', text: 'text-indigo-800', border: 'border-indigo-200', badge: 'text-indigo-700' },
+      { bg: 'bg-amber-100', text: 'text-amber-800', border: 'border-amber-200', badge: 'text-amber-700' }
+    ];
+
+    function fmtMoney(amount) {
+      return new Intl.NumberFormat('vi-VN').format(Math.round(amount || 0)) + 'đ';
+    }
+
+    function isAdmin() {
+      return currentAuthRole === 'admin';
+    }
+
+    // Toast Helper
+    let toastTimeout;
+    function showToast(msg, icon = 'check_circle', isError = false) {
+      const toast = document.getElementById('toast-notification');
+      const toastMessage = document.getElementById('toast-message');
+      const toastIcon = document.getElementById('toast-icon');
+      if (!toast) return;
+
+      clearTimeout(toastTimeout);
+      toastMessage.textContent = msg;
+      toastIcon.textContent = isError ? 'warning' : icon;
+      toastIcon.className = `material-symbols-outlined text-[20px] ${isError ? 'text-rose-600' : 'text-emerald-600'}`;
+      toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-[-100px]', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3200);
+    }
+
+    // ==================== AUTHENTICATION & ROLE MANAGEMENT ====================
+    function applyAuthRoleUI() {
+      const badge = document.getElementById('authStatusBadge');
+      const icon = document.getElementById('authRoleIcon');
+      const title = document.getElementById('authRoleTitle');
+      const sub = document.getElementById('authRoleSub');
+
+      const bannerBadge = document.getElementById('bannerRoleBadge');
+      const bannerDesc = document.getElementById('bannerRoleDesc');
+      const bannerBtn = document.getElementById('bannerLoginBtn');
+      const depRoleBadge = document.getElementById('depositPageRoleBadge');
+      const adminConfirmBox = document.getElementById('adminDepositConfirmBox');
+      const userNoticeBox = document.getElementById('userDepositNoticeBox');
+      const btnLogout = document.getElementById('btnLogoutAdmin');
+
+      const adminEls = document.querySelectorAll('.admin-only-el');
+
+      if (isAdmin()) {
+        badge.className = "cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 transition select-none";
+        icon.textContent = "verified_user";
+        icon.className = "material-symbols-outlined text-[18px] text-amber-600";
+        title.textContent = "Admin (Thủ quỹ)";
+        title.className = "text-xs font-extrabold text-amber-900 leading-none";
+        sub.textContent = "Toàn quyền tick quỹ";
+
+        bannerBadge.className = "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold";
+        bannerBadge.innerHTML = `<span class="material-symbols-outlined text-[14px]">verified_user</span> Đang đăng nhập: Admin (Thủ quỹ)`;
+        bannerDesc.innerHTML = `Bạn có toàn quyền <strong>tick xác nhận đã chuyển khoản quỹ</strong>, cộng tiền, sửa điểm danh và quản lý CLB.`;
+        bannerBtn.innerHTML = `<span class="material-symbols-outlined text-[15px]">logout</span> Chuyển về Người dùng`;
+        bannerBtn.onclick = handleLogoutAdmin;
+
+        if (depRoleBadge) {
+          depRoleBadge.textContent = "🛡️ Quyền Admin: Được tick cộng quỹ";
+          depRoleBadge.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200";
+        }
+        if (adminConfirmBox) adminConfirmBox.classList.remove('hidden');
+        if (userNoticeBox) userNoticeBox.classList.add('hidden');
+        if (btnLogout) btnLogout.classList.remove('hidden');
+
+        adminEls.forEach(el => el.classList.remove('hidden'));
+      } else {
+        badge.className = "cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition select-none";
+        icon.textContent = "person";
+        icon.className = "material-symbols-outlined text-[18px] text-slate-600";
+        title.textContent = currentLoggedUserName || "Thành viên";
+        title.className = "text-xs font-bold text-slate-800 leading-none";
+        sub.textContent = "Bấm đăng nhập Admin";
+
+        bannerBadge.className = "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold";
+        bannerBadge.innerHTML = `<span class="material-symbols-outlined text-[14px]">visibility</span> Chế độ Người dùng (${currentLoggedUserName})`;
+        bannerDesc.innerHTML = `Xem bảng đóng tiền của đội &amp; chọn mức giá đóng quỹ. <strong>Chỉ Admin mới được quyền tick đã chuyển khoản quỹ.</strong>`;
+        bannerBtn.innerHTML = `<span class="material-symbols-outlined text-[15px]">admin_panel_settings</span> Đăng nhập Admin`;
+        bannerBtn.onclick = openLoginModal;
+
+        if (depRoleBadge) {
+          depRoleBadge.textContent = "👤 Người dùng (Chờ Admin tick duyệt)";
+          depRoleBadge.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700";
+        }
+        if (adminConfirmBox) adminConfirmBox.classList.add('hidden');
+        if (userNoticeBox) userNoticeBox.classList.remove('hidden');
+        if (btnLogout) btnLogout.classList.add('hidden');
+
+        adminEls.forEach(el => el.classList.add('hidden'));
+      }
+
+      renderMatrixSheet();
+      renderPendingApprovals();
+      renderDepositsTab();
+    }
+
+    function openLoginModal() {
+      const sel = document.getElementById('loginUserSelect');
+      if (sel) {
+        sel.innerHTML = `<option value="Thành viên">-- Thành viên xem chung --</option>`;
+        players.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.name;
+          opt.textContent = p.name + (p.nickname ? ` (${p.nickname})` : '');
+          if (p.name === currentLoggedUserName) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      }
+      document.getElementById('loginErrorText').classList.add('hidden');
+      switchLoginModalTab(isAdmin() ? 'admin' : 'user');
+      document.getElementById('modalLogin').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('modalLogin').classList.add('hidden');
+    }
+
+    function switchLoginModalTab(tab) {
+      const tUser = document.getElementById('loginTabUser');
+      const tAdmin = document.getElementById('loginTabAdmin');
+      const pUser = document.getElementById('loginPanelUser');
+      const pAdmin = document.getElementById('loginPanelAdmin');
+
+      if (tab === 'admin') {
+        tAdmin.className = "py-2 rounded-lg text-xs font-bold bg-white text-amber-700 shadow-xs transition";
+        tUser.className = "py-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition";
+        pAdmin.classList.remove('hidden');
+        pUser.classList.add('hidden');
+        setTimeout(() => document.getElementById('adminPasswordInput')?.focus(), 50);
+      } else {
+        tUser.className = "py-2 rounded-lg text-xs font-bold bg-white text-emerald-700 shadow-xs transition";
+        tAdmin.className = "py-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition";
+        pUser.classList.remove('hidden');
+        pAdmin.classList.add('hidden');
+      }
+    }
+
+    function handleLoginAsUser() {
+      const selectedName = document.getElementById('loginUserSelect').value || 'Thành viên';
+      currentAuthRole = 'user';
+      currentLoggedUserName = selectedName;
+      localStorage.setItem('fc6h_role', 'user');
+      localStorage.setItem('fc6h_username', selectedName);
+      closeLoginModal();
+      applyAuthRoleUI();
+      showToast(`Đã vào chế độ Người dùng: ${selectedName}`, 'person');
+    }
+
+    function handleLoginAsAdmin(e) {
+      e.preventDefault();
+      const pwd = (document.getElementById('adminPasswordInput').value || '').trim();
+      if (pwd === 'ptcanh411') {
+        currentAuthRole = 'admin';
+        currentLoggedUserName = 'Admin (Thủ quỹ)';
+        localStorage.setItem('fc6h_role', 'admin');
+        localStorage.setItem('fc6h_username', 'Admin (Thủ quỹ)');
+        document.getElementById('adminPasswordInput').value = '';
+        closeLoginModal();
+        applyAuthRoleUI();
+        showToast('Đăng nhập Admin thành công! Đã mở khóa quyền tick chuyển khoản quỹ.', 'verified_user');
+      } else {
+        document.getElementById('loginErrorText').classList.remove('hidden');
+      }
+    }
+
+    function handleLogoutAdmin() {
+      currentAuthRole = 'user';
+      currentLoggedUserName = 'Thành viên';
+      localStorage.setItem('fc6h_role', 'user');
+      localStorage.setItem('fc6h_username', 'Thành viên');
+      closeLoginModal();
+      applyAuthRoleUI();
+      showToast('Đã đăng xuất quyền Admin, chuyển về chế độ Thành viên.');
+    }
+
+    // ==================== 1. INITIAL DATA FETCH ====================
+    async function initData() {
+      try {
+        const [resPlayers, resMatches, resConfig, resDeposits] = await Promise.all([
+          fetch('/api/players').then(r => r.json()),
+          fetch('/api/matches').then(r => r.json()),
+          fetch('/api/config').then(r => r.json()),
+          fetch('/api/deposits').then(r => r.json()).catch(() => [])
+        ]);
+
+        players = resPlayers;
+        matches = resMatches;
+        allDeposits = resDeposits || [];
+        if (resConfig && resConfig.bankAccount) clubConfig = resConfig;
+
+        renderKPIs();
+        applyAuthRoleUI();
+        renderMatchesSelector();
+        renderMembersTab();
+        renderScheduleTab();
+      } catch (err) {
+        console.error("Lỗi khi nạp dữ liệu:", err);
+        showToast("Lỗi kết nối máy chủ!", "error", true);
+      }
+    }
+
+    // ==================== 2. COMPACT TRACKER SUMMARY ====================
+    function renderKPIs() {
+      const totalInitial = players.reduce((s, p) => s + (p.initialDeposit || 0), 0);
+      const totalAdded = players.reduce((s, p) => s + (p.totalAddedDeposit || 0), 0);
+      const totalDirect = players.reduce((s, p) => s + (p.totalDirectDeposit || 0), 0);
+      const totalPaid = totalInitial + totalAdded + totalDirect;
+      const totalUsed = players.reduce((s, p) => s + (p.totalUsed || 0), 0);
+      const balance = totalPaid - totalUsed;
+
+      const debtors = players.filter(p => (p.balance || 0) < 0);
+      const enoughMembers = players.length - debtors.length;
+      const paidMembersCount = players.filter(p => (p.totalPaid || 0) > 0).length;
+      const totalDebt = debtors.reduce((s, p) => s + Math.abs(p.balance || 0), 0);
+
+      document.getElementById('kpiEnoughCount').textContent = `${enoughMembers} / ${players.length}`;
+      document.getElementById('kpiPaidRatio').textContent = `Đã nộp quỹ: ${paidMembersCount} người`;
+
+      document.getElementById('kpiDebtorsCount').textContent = `${debtors.length} người`;
+      document.getElementById('kpiTotalDebtAmount').textContent = debtors.length > 0 ? `(Thiếu ${fmtMoney(totalDebt)})` : `(Đủ 100%)`;
+
+      document.getElementById('kpiBalance').textContent = new Intl.NumberFormat('vi-VN').format(Math.round(balance));
+      document.getElementById('kpiTotalPaid').textContent = new Intl.NumberFormat('vi-VN').format(Math.round(totalPaid));
+      document.getElementById('kpiTotalUsed').textContent = new Intl.NumberFormat('vi-VN').format(Math.round(totalUsed));
+
+      document.getElementById('dockTotalPlayers').textContent = players.length;
+      document.getElementById('dockNetBalance').textContent = (balance > 0 ? '+' : '') + fmtMoney(balance);
+      if (matches.length > 0) {
+        const lastM = matches[matches.length - 1];
+        document.getElementById('dockAttendingCount').textContent = `${lastM.attendingCount || 0} Có mặt`;
+      }
+      document.getElementById('dockDebtBtnText').textContent = debtors.length > 0
+        ? `⚡ Nhắc nợ Zalo (${debtors.length} người)`
+        : `⚡ Báo cáo Zalo`;
+    }
+
+    // ==================== 3. TAB 1: MATRIX SHEET VIEW ====================
+    function getVisibleMatches() {
+      if (matrixFilterMode === 'recent3') return matches.slice(-3);
+      if (matrixFilterMode === 'recent5') return matches.slice(-5);
+      return matches.filter(m => !hiddenMatchIds.has(m.id));
+    }
+
+    function setMatrixFilter(mode) {
+      matrixFilterMode = mode;
+      const btnAll = document.getElementById('btnFilterAll');
+      const btn5 = document.getElementById('btnFilterRecent5');
+      const btn3 = document.getElementById('btnFilterRecent3');
+
+      [btnAll, btn5, btn3].forEach(b => {
+        if (b) b.className = "match-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all whitespace-nowrap";
+      });
+
+      const activeClass = "match-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-emerald-700 shadow-xs transition-all whitespace-nowrap";
+      if (mode === 'all') {
+        hiddenMatchIds.clear();
+        if (btnAll) btnAll.className = activeClass;
+      } else if (mode === 'recent5' && btn5) {
+        btn5.className = activeClass;
+      } else if (mode === 'recent3' && btn3) {
+        btn3.className = activeClass;
+      }
+      renderMatrixSheet();
+    }
+
+    function toggleHideSingleMatch(matchId) {
+      if (hiddenMatchIds.has(matchId)) hiddenMatchIds.delete(matchId);
+      else hiddenMatchIds.add(matchId);
+      matrixFilterMode = 'custom';
+      renderMatrixSheet();
+      renderScheduleTab();
+    }
+
+    function filterMatrixBySearch(val) {
+      searchQuery = (val || '').toLowerCase().trim();
+      matrixCurrentPage = 1;
+      renderMatrixSheet();
+    }
+
+    function toggleDebtOnlyFilter(checked) {
+      filterDebtOnly = checked;
+      matrixCurrentPage = 1;
+      renderMatrixSheet();
+    }
+
+    function setMatrixPageSize(size) {
+      matrixPageSize = size;
+      matrixCurrentPage = 1;
+      const btnAll = document.getElementById('btnPageAll');
+      const btn10 = document.getElementById('btnPage10');
+      if (size === 'all') {
+        btnAll.className = "px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold transition";
+        btn10.className = "px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 font-semibold transition";
+      } else {
+        btn10.className = "px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold transition";
+        btnAll.className = "px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 font-semibold transition";
+      }
+      renderMatrixSheet();
+    }
+
+    function goToMatrixPage(p) {
+      matrixCurrentPage = p;
+      renderMatrixSheet();
+    }
+
+    async function quickToggleMatrixCell(matchId, playerId) {
+      if (!isAdmin()) {
+        showToast('Chỉ Admin (Thủ quỹ) mới được điểm danh Có mặt / Vắng!', 'lock', true);
+        return;
+      }
+      const targetPlayer = players.find(p => p.id === playerId);
+      const match = matches.find(m => m.id === matchId);
+      if (!targetPlayer || !match) return;
+
+      if (!targetPlayer.matchRecords) targetPlayer.matchRecords = {};
+      const targetRec = targetPlayer.matchRecords[matchId] || { isPresent: false, feeCharged: 0, addedDeposit: 0 };
+      const currentlyPresent = Boolean(targetRec.isPresent) || (targetRec.feeCharged > 0);
+      const nextPresent = !currentlyPresent;
+
+      // 1. Cập nhật trạng thái người vừa bấm
+      targetRec.isPresent = nextPresent ? 1 : 0;
+      if (!nextPresent) {
+        targetRec.hasDrinks = 0;
+      }
+
+      // 2. Đếm chính xác tổng số người đang Có mặt ở trận này
+      const presentPlayers = players.filter(p => {
+        const r = p.matchRecords && p.matchRecords[matchId];
+        return r && Boolean(r.isPresent);
+      });
+      const newAttendingCount = presentPlayers.length;
+      match.attendingCount = newAttendingCount;
+
+      // 3. Lấy tổng tiền sân chia đều cho số người có mặt
+      const totalPitchFee = match.pitchFee || 0;
+      const pitchShare = newAttendingCount > 0 ? Math.round((totalPitchFee / newAttendingCount) / 1000) * 1000 : 0;
+      const drinkPrice = match.defaultDrinkPerPerson || 10000;
+
+      // 4. Cập nhật lại số tiền trừ (feeCharged) cho TẤT CẢ thành viên trong trận
+      const updates = [];
+      players.forEach(p => {
+        if (!p.matchRecords) p.matchRecords = {};
+        if (!p.matchRecords[matchId]) {
+          p.matchRecords[matchId] = { isPresent: 0, hasDrinks: 0, drinkAmount: 0, pitchShare: 0, feeCharged: 0, addedDeposit: 0 };
+        }
+        const r = p.matchRecords[matchId];
+        if (r.isPresent) {
+          r.pitchShare = pitchShare;
+          r.feeCharged = pitchShare + (r.hasDrinks ? drinkPrice : 0);
+        } else {
+          r.pitchShare = 0;
+          r.feeCharged = 0;
+          r.hasDrinks = 0;
+        }
+
+        // Cập nhật lại tổng đã dùng và số dư của từng người
+        p.totalUsed = Object.values(p.matchRecords).reduce((sum, item) => sum + (item.feeCharged || 0), 0);
+        p.balance = (p.totalPaid || 0) - p.totalUsed;
+
+        updates.push({
+          matchId,
+          playerId: p.id,
+          isPresent: r.isPresent ? 1 : 0,
+          pitchShare: r.pitchShare,
+          feeCharged: r.feeCharged,
+          addedDeposit: r.addedDeposit || 0
+        });
+      });
+
+      // 5. Cập nhật giao diện ngay lập tức
+      renderKPIs();
+      renderMatrixSheet();
+
+      const shareText = newAttendingCount > 0 ? `(${newAttendingCount} người: ${fmtMoney(pitchShare)}/người)` : '(0 người có mặt)';
+      const statusText = nextPresent ? `Có mặt` : `Vắng`;
+      showToast(`${targetPlayer.name}: ${statusText} ${shareText}`);
+
+      // 6. Tự động lưu lên server
+      try {
+        await fetch('/api/batch-save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ updates })
+        });
+        const ind = document.getElementById('saveStatusIndicator');
+        if (ind) {
+          ind.innerHTML = `<span class="material-symbols-outlined text-[14px]">done_all</span> Đã lưu (${newAttendingCount} người: ${fmtMoney(pitchShare)}/người)`;
+          ind.className = "inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 font-semibold";
+        }
+      } catch (err) {
+        console.error("Lỗi tự động lưu:", err);
+      }
+    }
+
+    function renderMatrixSheet() {
+      const headerRow = document.getElementById('matrixHeaderRow');
+      const tableBody = document.getElementById('player-matrix-body');
+      const tableFoot = document.getElementById('matrixTableFoot');
+      if (!headerRow || !tableBody) return;
+
+      const visibleMatches = getVisibleMatches();
+      const hiddenCount = matches.length - visibleMatches.length;
+
+      const banner = document.getElementById('hiddenMatchesBanner');
+      if (hiddenCount > 0) {
+        banner.classList.remove('hidden');
+        document.getElementById('bannerHiddenCount').textContent = hiddenCount;
+      } else {
+        banner.classList.add('hidden');
+      }
+
+      let headerHtml = `
+        <th class="py-3.5 px-4 sticky left-0 bg-slate-50 z-20 w-64 shadow-[1px_0_0_0_#e2e8f0]" scope="col">THÀNH VIÊN CLB</th>
+      `;
+
+      visibleMatches.forEach((m, mIdx) => {
+        const d = new Date(m.matchDate);
+        const dayStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const isLatest = mIdx === visibleMatches.length - 1;
+
+        headerHtml += `
+          <th class="py-3 px-3 text-center border-l border-slate-200/60 min-w-[130px]" scope="col">
+            <div class="flex flex-col items-center relative group">
+              <div class="flex items-center gap-1">
+                <span class="${isLatest ? 'text-emerald-700' : 'text-slate-900'} font-bold">CN ${dayStr}</span>
+                <button onclick="toggleHideSingleMatch('${m.id}')" class="text-slate-400 hover:text-amber-600 opacity-0 group-hover:opacity-100 transition-opacity" title="Ẩn cột này">
+                  <span class="material-symbols-outlined text-[14px]">visibility_off</span>
+                </button>
+              </div>
+              <span class="text-[11px] text-slate-500 font-normal">${m.stadiumName || 'Sân 6h50'}</span>
+              ${m.pitchFee > 0 ? `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/70 mt-0.5" title="Tiền sân: ${fmtMoney(m.pitchFee)}">${fmtMoney(m.pitchFee)}</span>` : ''}
+            </div>
+          </th>
+        `;
+      });
+
+      headerHtml += `
+        <th class="py-3.5 px-4 text-right border-l border-slate-200/60 w-32" scope="col">TỔNG ĐÃ ĐÓNG</th>
+        <th class="py-3.5 px-4 text-right border-l border-slate-200/60 w-36" scope="col">SỐ DƯ / TRẠNG THÁI</th>
+        <th class="py-3.5 px-4 text-center border-l border-slate-200/60 w-44" scope="col">ĐÓNG QUỸ &amp; LỊCH SỬ</th>
+      `;
+      headerRow.innerHTML = headerHtml;
+
+      let filteredPlayers = players.map((p, idx) => ({ ...p, _origIdx: idx }));
+      if (searchQuery) {
+        filteredPlayers = filteredPlayers.filter(p => {
+          const numStr = String(p.displayOrder || (p._origIdx + 1)).padStart(2, '0');
+          return p.name.toLowerCase().includes(searchQuery) ||
+                 (p.nickname && p.nickname.toLowerCase().includes(searchQuery)) ||
+                 numStr.includes(searchQuery);
+        });
+      }
+      if (filterDebtOnly) {
+        filteredPlayers = filteredPlayers.filter(p => (p.balance || 0) < 0);
+      }
+
+      const totalFiltered = filteredPlayers.length;
+      let displayPlayers = filteredPlayers;
+      const pageContainer = document.getElementById('pageButtonsContainer');
+
+      if (matrixPageSize !== 'all') {
+        const pageSize = Number(matrixPageSize) || 10;
+        const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize));
+        if (matrixCurrentPage > totalPages) matrixCurrentPage = totalPages;
+        const startIdx = (matrixCurrentPage - 1) * pageSize;
+        displayPlayers = filteredPlayers.slice(startIdx, startIdx + pageSize);
+
+        pageContainer.classList.remove('hidden');
+        let pageBtns = '';
+        for (let i = 1; i <= totalPages; i++) {
+          pageBtns += `<button onclick="goToMatrixPage(${i})" class="px-2.5 py-1 rounded-lg text-xs font-bold ${i === matrixCurrentPage ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'}">${i}</button>`;
+        }
+        pageContainer.innerHTML = pageBtns;
+      } else {
+        pageContainer.classList.add('hidden');
+      }
+
+      document.getElementById('matrixFooterCountText').innerHTML =
+        `Hiển thị <strong class="text-slate-900 font-bold">${displayPlayers.length}</strong> / ${players.length} thành viên câu lạc bộ FC 6H`;
+
+      tableBody.innerHTML = '';
+      displayPlayers.forEach((p) => {
+        const idx = p._origIdx;
+        const isDebt = (p.balance || 0) < 0;
+        const hasPaid = (p.totalPaid || 0) > 0;
+        const numVal = p.displayOrder || (idx + 1);
+        const numStr = String(numVal).padStart(2, '0');
+        const initialLetter = p.name ? p.name.trim().charAt(0).toUpperCase() : '?';
+        const palette = isDebt
+          ? { bg: 'bg-rose-100', text: 'text-rose-800', border: 'border-rose-200', badge: 'text-rose-700' }
+          : AVATAR_PALETTES[idx % AVATAR_PALETTES.length];
+
+        const tr = document.createElement('tr');
+        tr.className = `player-row ${isDebt ? 'bg-rose-50/30 hover:bg-rose-50/60' : 'hover:bg-slate-50/80'} transition-colors`;
+
+        let rowHtml = `
+          <td class="py-3 px-4 sticky left-0 ${isDebt ? 'bg-white hover:bg-rose-50/60' : 'bg-white hover:bg-slate-50/80'} z-10 shadow-[1px_0_0_0_#f1f5f9]">
+            <div class="flex items-center gap-3">
+              <div class="relative w-9 h-9 rounded-full ${palette.bg} ${palette.text} font-bold flex items-center justify-center text-sm shadow-xs border ${palette.border} flex-shrink-0">
+                ${initialLetter}
+                <span class="absolute -bottom-1 -right-1 px-1 rounded bg-white ${palette.badge} text-[9px] font-extrabold border border-slate-200">#${numStr}</span>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span onclick="openPlayerHistoryModal('${p.id}')" class="font-bold text-slate-900 truncate cursor-pointer hover:text-emerald-700" title="Xem lịch sử đóng quỹ của ${p.name}">${p.name}</span>
+                  ${isDebt ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 border border-rose-200 font-bold">CHƯA ĐÓNG ĐỦ</span>` : hasPaid ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">ĐÃ ĐÓNG</span>` : ''}
+                </div>
+                <span class="text-xs text-slate-500 truncate">${p.nickname || 'Thành viên CLB'}</span>
+              </div>
+            </div>
+          </td>
+        `;
+
+        visibleMatches.forEach(m => {
+          const rec = (p.matchRecords && p.matchRecords[m.id]) || { isPresent: false, feeCharged: 0, addedDeposit: 0 };
+          const isPresent = (rec.feeCharged > 0) || Boolean(rec.isPresent);
+
+          let statusBadgeHtml = '';
+          if (isPresent) {
+            statusBadgeHtml = `
+              <button onclick="quickToggleMatrixCell('${m.id}', '${p.id}')" class="status-cell-btn inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold transition-transform hover:scale-105 active:scale-95" type="button">
+                <span class="material-symbols-outlined text-[15px] text-emerald-600">sports_soccer</span> Có mặt
+              </button>
+            `;
+          } else {
+            statusBadgeHtml = `
+              <button onclick="quickToggleMatrixCell('${m.id}', '${p.id}')" class="status-cell-btn inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-semibold transition-transform hover:scale-105 active:scale-95" type="button">
+                <span class="material-symbols-outlined text-[15px] text-slate-400">block</span> Vắng
+              </button>
+            `;
+          }
+
+          rowHtml += `
+            <td class="py-3 px-2 text-center border-l border-slate-100">
+              ${statusBadgeHtml}
+            </td>
+          `;
+        });
+
+        // Balance Badge
+        let balanceBadge = '';
+        if (isDebt) {
+          balanceBadge = `
+            <span class="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300 font-extrabold text-xs tabular-nums">
+              <span class="material-symbols-outlined text-[13px] text-rose-600">priority_high</span> ${fmtMoney(p.balance)}
+            </span>
+          `;
+        } else if ((p.balance || 0) > 0) {
+          balanceBadge = `
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs tabular-nums">
+              +${fmtMoney(p.balance)}
+            </span>
+          `;
+        } else {
+          balanceBadge = `
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-bold text-xs tabular-nums">
+              0đ (Chưa phát sinh)
+            </span>
+          `;
+        }
+
+        // Actions: Go to Price Selection Deposit Page + View Individual History
+        const suggestedAmt = isDebt ? Math.abs(p.balance) : 0;
+        const actionsHtml = `
+          <div class="flex items-center justify-center gap-1.5">
+            <button onclick="goToDepositPage('${p.id}', ${suggestedAmt})" class="px-2.5 py-1 rounded-lg ${isDebt ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'bg-amber-500 hover:bg-amber-600 text-white'} font-semibold text-xs flex items-center gap-1 shadow-2xs transition-all" title="Chọn mức giá đóng quỹ cho ${p.name}" type="button">
+              <span class="material-symbols-outlined text-[15px]">payments</span> Đóng quỹ
+            </button>
+            <button onclick="openPlayerHistoryModal('${p.id}')" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs flex items-center gap-1 transition-all border border-slate-200" title="Xem lịch sử đóng quỹ của ${p.name}" type="button">
+              <span class="material-symbols-outlined text-[15px]">history</span> Lịch sử
+            </button>
+            ${isAdmin() ? `
+              <button onclick="openEditPlayerModal('${p.id}')" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-all border border-slate-200" title="Sửa thông tin" type="button">
+                <span class="material-symbols-outlined text-[15px]">edit</span>
+              </button>
+            ` : ''}
+          </div>
+        `;
+
+        rowHtml += `
+          <td class="py-3 px-4 text-right font-bold text-amber-700 tabular-nums border-l border-slate-100">${fmtMoney(p.totalPaid)}</td>
+          <td class="py-3 px-4 text-right border-l border-slate-100">${balanceBadge}</td>
+          <td class="py-3 px-3 text-center border-l border-slate-100">${actionsHtml}</td>
+        `;
+
+        tr.innerHTML = rowHtml;
+        tableBody.appendChild(tr);
+      });
+
+      // Footer Summary Row
+      let footHtml = `
+        <tr>
+          <td class="py-3.5 px-4 sticky left-0 bg-slate-100 text-slate-900 font-extrabold z-10 shadow-[1px_0_0_0_#e2e8f0]">
+            TỔNG CỘNG (${players.length} TV)
+          </td>
+      `;
+
+      visibleMatches.forEach(m => {
+        let countPresent = 0;
+        players.forEach(p => {
+          const rec = (p.matchRecords && p.matchRecords[m.id]) || {};
+          if ((rec.feeCharged > 0) || rec.isPresent) countPresent++;
+        });
+        const pitchShare = countPresent > 0 ? Math.round(((m.pitchFee || 0) / countPresent) / 1000) * 1000 : 0;
+        footHtml += `
+          <td class="py-3 px-2 text-center border-l border-slate-200/80 bg-slate-100">
+            <div class="flex flex-col items-center gap-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold">
+                ${countPresent} Có mặt
+              </span>
+              ${countPresent > 0 && m.pitchFee > 0 ? `
+                <span class="text-[10px] font-bold text-slate-600">(${fmtMoney(pitchShare)}/người)</span>
+              ` : ''}
+            </div>
+          </td>
+        `;
+      });
+
+      footHtml += `
+          <td class="py-3.5 px-4 text-right font-extrabold text-amber-700 tabular-nums border-l border-slate-200/80 bg-slate-100">
+            ${document.getElementById('kpiTotalPaid').textContent}đ
+          </td>
+          <td class="py-3.5 px-4 text-right font-extrabold text-emerald-700 tabular-nums border-l border-slate-200/80 bg-slate-100">
+            ${document.getElementById('kpiBalance').textContent}đ
+          </td>
+          <td class="py-3.5 px-4 bg-slate-100 border-l border-slate-200/80"></td>
+        </tr>
+      `;
+      tableFoot.innerHTML = footHtml;
+    }
+
+    // ==================== 4. TRANG CHỌN MỨC GIÁ ĐÓNG QUỸ & LỊCH SỬ TỪNG NGƯỜI ====================
+    function goToDepositPage(playerId = '', suggestedAmount = 0) {
+      switchTab('deposits');
+      const sel = document.getElementById('tabDepositPlayerId');
+      if (playerId && sel) {
+        sel.value = playerId;
+      }
+      onDepositPlayerChange();
+
+      if (suggestedAmount > 0) {
+        selectDepositTier(suggestedAmount);
+      } else {
+        document.getElementById('tabDepositAmount').focus();
+      }
+    }
+
+    function renderDepositsTab() {
+      const sel = document.getElementById('tabDepositPlayerId');
+      const histFilter = document.getElementById('historyPlayerFilter');
+      if (!sel) return;
+
+      const currentVal = sel.value;
+      sel.innerHTML = '';
+      if (histFilter) {
+        const currentHistVal = histFilter.value || 'ALL';
+        histFilter.innerHTML = `<option value="ALL">Tất cả thành viên (${players.length})</option>`;
+        players.forEach(p => {
+          const optH = document.createElement('option');
+          optH.value = p.id;
+          optH.textContent = `${p.name} (Đã đóng: ${fmtMoney(p.totalPaid)})`;
+          if (p.id === currentHistVal) optH.selected = true;
+          histFilter.appendChild(optH);
+        });
+      }
+
+      players.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        const statusStr = p.balance < 0 ? `Đang thiếu ${fmtMoney(Math.abs(p.balance))}` : `Số dư: +${fmtMoney(p.balance)}`;
+        opt.textContent = `${p.name} — ${statusStr}`;
+        sel.appendChild(opt);
+      });
+
+      if (currentVal && players.some(p => p.id === currentVal)) {
+        sel.value = currentVal;
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('tabDepositDate');
+      if (dateInput && !dateInput.value) dateInput.value = today;
+
+      onDepositPlayerChange();
+      renderPerPlayerDepositSummary();
+      renderDepositHistoryList();
+      renderPendingApprovals();
+    }
+
+    function onDepositPlayerChange() {
+      const playerId = document.getElementById('tabDepositPlayerId')?.value;
+      const player = players.find(p => p.id === playerId);
+      const notice = document.getElementById('selectedPlayerBalanceNotice');
+      if (!player || !notice) return;
+
+      const isDebt = (player.balance || 0) < 0;
+      if (isDebt) {
+        const debtAmt = Math.abs(player.balance);
+        notice.className = "mt-2 p-3 rounded-xl bg-rose-50 border border-rose-200 flex flex-wrap items-center justify-between gap-2 text-xs";
+        notice.innerHTML = `
+          <div>
+            <span class="font-bold text-rose-800">${player.name}</span> đang thiếu quỹ <strong class="text-rose-600 font-extrabold">${fmtMoney(debtAmt)}</strong>
+            <span class="text-slate-500 ml-1">(Tổng đã đóng: ${fmtMoney(player.totalPaid)})</span>
+          </div>
+          <button type="button" onclick="selectDepositTier(${debtAmt})" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition">
+            Chọn đóng đúng ${fmtMoney(debtAmt)}
+          </button>
+        `;
+      } else {
+        notice.className = "mt-2 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-wrap items-center justify-between gap-2 text-xs";
+        notice.innerHTML = `
+          <div>
+            <span class="font-bold text-emerald-900">${player.name}</span> hiện có số dư <strong class="text-emerald-700 font-extrabold">+${fmtMoney(player.balance)}</strong>
+            <span class="text-slate-500 ml-1">(Tổng đã đóng: ${fmtMoney(player.totalPaid)})</span>
+          </div>
+          <button type="button" onclick="openPlayerHistoryModal('${player.id}')" class="text-emerald-700 font-bold underline">
+            Xem lịch sử của ${player.name}
+          </button>
+        `;
+      }
+      updateLiveQrDisplay();
+    }
+
+    function selectDepositTier(amount) {
+      const input = document.getElementById('tabDepositAmount');
+      if (input) input.value = amount;
+
+      document.querySelectorAll('.tier-card').forEach(btn => {
+        const tierAmt = Number(btn.getAttribute('data-tier'));
+        if (tierAmt === Number(amount)) {
+          btn.className = "tier-card p-3 rounded-xl border-2 border-emerald-600 bg-emerald-50 text-left transition flex flex-col justify-between shadow-xs";
+        } else {
+          btn.className = "tier-card p-3 rounded-xl border border-slate-200 bg-slate-50 hover:border-emerald-500 hover:bg-emerald-50/50 text-left transition flex flex-col justify-between";
+        }
+      });
+
+      updateLiveQrDisplay();
+    }
+
+    function onCustomDepositInput() {
+      const val = Number(document.getElementById('tabDepositAmount')?.value || 0);
+      document.querySelectorAll('.tier-card').forEach(btn => {
+        const tierAmt = Number(btn.getAttribute('data-tier'));
+        if (tierAmt === val) {
+          btn.className = "tier-card p-3 rounded-xl border-2 border-emerald-600 bg-emerald-50 text-left transition flex flex-col justify-between shadow-xs";
+        } else {
+          btn.className = "tier-card p-3 rounded-xl border border-slate-200 bg-slate-50 hover:border-emerald-500 hover:bg-emerald-50/50 text-left transition flex flex-col justify-between";
+        }
+      });
+      updateLiveQrDisplay();
+    }
+
+    function updateLiveQrDisplay() {
+      const playerId = document.getElementById('tabDepositPlayerId')?.value;
+      const player = players.find(p => p.id === playerId);
+      const amount = Number(document.getElementById('tabDepositAmount')?.value || 0);
+
+      const amtEl = document.getElementById('liveQrSelectedAmount');
+      const synEl = document.getElementById('liveQrSyntaxText');
+      if (!amtEl || !synEl) return;
+
+      const pNameClean = (player?.name || 'THANHVIEN').replace(/[^a-zA-Z0-9\s]/g, '').toUpperCase();
+      if (amount > 0) {
+        amtEl.textContent = fmtMoney(amount);
+        synEl.textContent = `${pNameClean} DONG QUY ${Math.round(amount / 1000)}K`;
+      } else {
+        amtEl.textContent = "Hãy chọn mức tiền bên trái";
+        synEl.textContent = `${pNameClean} DONG QUY FC6H`;
+      }
+    }
+
+    function copyLiveQrSyntax() {
+      const text = document.getElementById('liveQrSyntaxText')?.innerText || 'FC6H DONG QUY';
+      navigator.clipboard?.writeText(text);
+      showToast('Đã sao chép nội dung chuyển khoản!', 'content_copy');
+    }
+
+    // Admin directly ticks & confirms deposit
+    async function adminSubmitDeposit() {
+      if (!isAdmin()) {
+        showToast('Chỉ Admin mới có quyền tick xác nhận đã chuyển khoản quỹ!', 'lock', true);
+        return;
+      }
+
+      const verified = document.getElementById('chkAdminVerifiedTransfer')?.checked;
+      if (!verified) {
+        showToast('Vui lòng tick vào ô xác nhận thành viên đã chuyển khoản!', 'warning', true);
+        return;
+      }
+
+      const playerId = document.getElementById('tabDepositPlayerId').value;
+      const amount = parseFloat(document.getElementById('tabDepositAmount').value) || 0;
+      const note = document.getElementById('tabDepositNote').value.trim() || 'Đã CK đóng quỹ (Admin đã tick)';
+      const depositDate = document.getElementById('tabDepositDate').value;
+
+      if (!playerId || amount <= 0) {
+        showToast("Vui lòng chọn hoặc nhập mức tiền đóng quỹ!", "warning", true);
+        return;
+      }
+
+      try {
+        await fetch('/api/deposits', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ playerId, amount, note, depositDate })
+        });
+
+        const player = players.find(p => p.id === playerId);
+        showToast(`Admin đã tick xác nhận: Cộng +${fmtMoney(amount)} cho ${player?.name}!`, "verified");
+        document.getElementById('tabDepositAmount').value = '';
+        updateLiveQrDisplay();
+        await initData();
+      } catch (err) {
+        showToast("Lỗi khi ghi nhận đóng quỹ!", "error", true);
+      }
+    }
+
+    // Normal user submits a notification that they transferred -> waits for Admin to tick
+    function userSubmitPendingDeposit() {
+      const playerId = document.getElementById('tabDepositPlayerId').value;
+      const amount = parseFloat(document.getElementById('tabDepositAmount').value) || 0;
+      const note = document.getElementById('tabDepositNote').value.trim() || 'CK VietQR (Chờ Admin duyệt)';
+      const depositDate = document.getElementById('tabDepositDate').value || new Date().toISOString().split('T')[0];
+
+      if (!playerId || amount <= 0) {
+        showToast("Vui lòng chọn mức giá đóng quỹ trước khi gửi báo!", "warning", true);
+        return;
+      }
+
+      const player = players.find(p => p.id === playerId);
+      const req = {
+        id: 'req-' + Date.now(),
+        playerId,
+        playerName: player ? player.name : 'Thành viên',
+        amount,
+        note,
+        depositDate
+      };
+
+      pendingTransferRequests.unshift(req);
+      localStorage.setItem('fc6h_pending_deposits', JSON.stringify(pendingTransferRequests));
+      document.getElementById('tabDepositAmount').value = '';
+      renderPendingApprovals();
+      showToast(`Đã gửi báo đóng ${fmtMoney(amount)} của ${req.playerName}! Chờ Admin tick xác nhận.`, 'schedule_send');
+    }
+
+    function renderPendingApprovals() {
+      const card = document.getElementById('pendingApprovalsCard');
+      const list = document.getElementById('pendingApprovalsList');
+      const pill = document.getElementById('pendingCountPill');
+      const navBadge = document.getElementById('pendingDepositsBadge');
+      if (!card || !list) return;
+
+      if (pendingTransferRequests.length === 0) {
+        card.classList.add('hidden');
+        if (navBadge) navBadge.classList.add('hidden');
+        return;
+      }
+
+      card.classList.remove('hidden');
+      pill.textContent = pendingTransferRequests.length;
+      if (navBadge) {
+        navBadge.textContent = pendingTransferRequests.length;
+        navBadge.classList.remove('hidden');
+      }
+
+      list.innerHTML = '';
+      pendingTransferRequests.forEach(req => {
+        const div = document.createElement('div');
+        div.className = "p-3 rounded-xl bg-amber-50/70 border border-amber-200 flex items-center justify-between gap-2 text-xs";
+        div.innerHTML = `
+          <div>
+            <div class="font-bold text-slate-900">${req.playerName} <span class="text-emerald-700 font-extrabold">+${fmtMoney(req.amount)}</span></div>
+            <div class="text-[11px] text-slate-500">${req.note} • ${req.depositDate}</div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            ${isAdmin() ? `
+              <button onclick="adminApprovePendingDeposit('${req.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-2xs transition">
+                <span class="material-symbols-outlined text-[15px]">check_box</span> Tick Duyệt
+              </button>
+              <button onclick="adminRejectPendingDeposit('${req.id}')" class="p-1.5 rounded-lg bg-slate-200 hover:bg-rose-100 text-slate-600 hover:text-rose-700 transition" title="Hủy yêu cầu">
+                <span class="material-symbols-outlined text-[15px]">close</span>
+              </button>
+            ` : `
+              <span class="px-2 py-1 rounded bg-amber-100 text-amber-800 font-semibold text-[11px]">Chờ Admin tick</span>
+            `}
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function adminApprovePendingDeposit(reqId) {
+      if (!isAdmin()) {
+        showToast('Chỉ Admin mới được tick xác nhận chuyển khoản!', 'lock', true);
+        return;
+      }
+      const req = pendingTransferRequests.find(r => r.id === reqId);
+      if (!req) return;
+
+      try {
+        await fetch('/api/deposits', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            playerId: req.playerId,
+            amount: req.amount,
+            note: req.note + ' (Admin đã duyệt)',
+            depositDate: req.depositDate
+          })
+        });
+
+        pendingTransferRequests = pendingTransferRequests.filter(r => r.id !== reqId);
+        localStorage.setItem('fc6h_pending_deposits', JSON.stringify(pendingTransferRequests));
+        showToast(`Đã tick duyệt +${fmtMoney(req.amount)} vào quỹ của ${req.playerName}!`, 'verified');
+        await initData();
+      } catch (err) {
+        showToast('Lỗi khi duyệt khoản đóng quỹ!', 'error', true);
+      }
+    }
+
+    function adminRejectPendingDeposit(reqId) {
+      if (!isAdmin()) return;
+      pendingTransferRequests = pendingTransferRequests.filter(r => r.id !== reqId);
+      localStorage.setItem('fc6h_pending_deposits', JSON.stringify(pendingTransferRequests));
+      renderPendingApprovals();
+      showToast('Đã xóa yêu cầu chờ duyệt.');
+    }
+
+    // Render Per-Player Deposit Summary in Tab 2
+    function renderPerPlayerDepositSummary() {
+      const container = document.getElementById('perPlayerDepositSummaryList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      players.forEach((p, idx) => {
+        const playerDirectDeps = allDeposits.filter(d => d.playerId === p.id);
+        let matchDepCount = 0;
+        if (p.matchRecords) {
+          Object.values(p.matchRecords).forEach(r => {
+            if ((r.addedDeposit || 0) > 0) matchDepCount++;
+          });
+        }
+        const totalTimes = playerDirectDeps.length + matchDepCount + (p.initialDeposit > 0 ? 1 : 0);
+        const isDebt = (p.balance || 0) < 0;
+
+        const row = document.createElement('div');
+        row.className = "py-2.5 px-2 hover:bg-slate-50 flex items-center justify-between gap-2 cursor-pointer rounded-lg transition";
+        row.onclick = () => {
+          const histFilter = document.getElementById('historyPlayerFilter');
+          if (histFilter) {
+            histFilter.value = p.id;
+            renderDepositHistoryList();
+          }
+        };
+
+        row.innerHTML = `
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-[11px] flex items-center justify-center flex-shrink-0">#${String(idx + 1).padStart(2, '0')}</span>
+            <div class="min-w-0">
+              <div class="font-bold text-slate-900 text-xs truncate">${p.name}</div>
+              <div class="text-[11px] text-slate-500">${totalTimes} lần đóng quỹ</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="text-right tabular-nums">
+              <div class="text-xs font-extrabold text-amber-700">${fmtMoney(p.totalPaid)}</div>
+              <div class="text-[10px] font-bold ${isDebt ? 'text-rose-600' : 'text-emerald-700'}">Dư: ${(p.balance > 0 ? '+' : '') + fmtMoney(p.balance)}</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); openPlayerHistoryModal('${p.id}')" class="p-1.5 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700" title="Xem chi tiết">
+              <span class="material-symbols-outlined text-[16px]">visibility</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // Combined Deposit History (Direct deposits + Added deposits at matches)
+    function renderDepositHistoryList() {
+      const tbody = document.getElementById('tabDepositHistoryTable');
+      const countEl = document.getElementById('tabDepositHistoryCount');
+      const filterPlayerId = document.getElementById('historyPlayerFilter')?.value || 'ALL';
+      if (!tbody) return;
+
+      // Build unified list of all deposit events (Direct + Match addedDeposit + Initial)
+      const combinedEvents = [];
+
+      allDeposits.forEach(d => {
+        if (filterPlayerId === 'ALL' || d.playerId === filterPlayerId) {
+          combinedEvents.push({
+            id: d.id,
+            playerId: d.playerId,
+            playerName: d.playerName,
+            amount: d.amount,
+            note: d.note || 'Đóng quỹ trực tiếp',
+            date: d.depositDate ? d.depositDate.split('T')[0] : '',
+            canDelete: true
+          });
+        }
+      });
+
+      players.forEach(p => {
+        if (filterPlayerId !== 'ALL' && p.id !== filterPlayerId) return;
+        if (p.matchRecords) {
+          Object.entries(p.matchRecords).forEach(([mId, rec]) => {
+            if ((rec.addedDeposit || 0) > 0) {
+              const m = matches.find(x => x.id === mId);
+              const mDate = m && m.matchDate ? m.matchDate.split('T')[0] : '';
+              combinedEvents.push({
+                id: null,
+                playerId: p.id,
+                playerName: p.name,
+                amount: rec.addedDeposit,
+                note: `Đóng tại sân (${m ? m.title : 'Trận CN'})`,
+                date: mDate,
+                canDelete: false
+              });
+            }
+          });
+        }
+      });
+
+      countEl.textContent = `${combinedEvents.length} lần đóng`;
+
+      if (combinedEvents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Chưa có lịch sử đóng quỹ nào cho bộ lọc này</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = '';
+      combinedEvents.forEach(ev => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition-colors";
+        tr.innerHTML = `
+          <td class="p-3 font-bold text-slate-900">
+            <button onclick="openPlayerHistoryModal('${ev.playerId}')" class="hover:text-emerald-700 hover:underline text-left">${ev.playerName}</button>
+          </td>
+          <td class="p-3 text-right font-mono font-extrabold text-emerald-700 tabular-nums">+${fmtMoney(ev.amount)}</td>
+          <td class="p-3 text-slate-600">${ev.note}</td>
+          <td class="p-3 text-slate-500 font-mono text-xs">${ev.date}</td>
+          <td class="p-3 text-center">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
+              <span class="material-symbols-outlined text-[13px]">check_circle</span> Đã cộng quỹ
+            </span>
+          </td>
+          <td class="p-3 text-center">
+            ${ev.canDelete && isAdmin() ? `
+              <button onclick="handleDeleteDeposit('${ev.id}', '${ev.playerName}', ${ev.amount})" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Xóa khoản đóng này">
+                <span class="material-symbols-outlined text-[18px]">delete</span>
+              </button>
+            ` : `<span class="text-slate-300">-</span>`}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function handleDeleteDeposit(depId, playerName, amount) {
+      if (!isAdmin()) {
+        showToast('Chỉ Admin mới được xóa lịch sử đóng quỹ!', 'lock', true);
+        return;
+      }
+      if (!confirm(`Xác nhận xóa giao dịch đóng ${fmtMoney(amount)} của "${playerName}"?`)) return;
+
+      try {
+        await fetch(`/api/deposits/${depId}`, { method: 'DELETE' });
+        showToast(`Đã xóa giao dịch nạp của ${playerName}!`);
+        await initData();
+      } catch (err) {
+        showToast("Lỗi khi xóa giao dịch!", "error", true);
+      }
+    }
+
+    // ==================== PLAYER INDIVIDUAL HISTORY MODAL ====================
+    function openPlayerHistoryModal(playerId) {
+      const p = players.find(x => x.id === playerId);
+      if (!p) return;
+
+      document.getElementById('historyModalPlayerName').textContent = `Lịch sử đóng quỹ: ${p.name}`;
+      document.getElementById('historyModalPlayerSub').textContent = `${p.nickname || 'Thành viên FC 6H'} ${p.phoneNumber ? '• SĐT: ' + p.phoneNumber : ''}`;
+      document.getElementById('historyTotalPaid').textContent = fmtMoney(p.totalPaid);
+      document.getElementById('historyTotalUsed').textContent = fmtMoney(p.totalUsed);
+      const balEl = document.getElementById('historyBalance');
+      balEl.textContent = (p.balance > 0 ? '+' : '') + fmtMoney(p.balance);
+      balEl.className = `text-sm font-extrabold mt-0.5 tabular-nums ${p.balance < 0 ? 'text-rose-600' : 'text-emerald-700'}`;
+
+      const depBtn = document.getElementById('historyModalDepositBtn');
+      if (depBtn) {
+        const sug = p.balance < 0 ? Math.abs(p.balance) : 0;
+        depBtn.onclick = () => {
+          closePlayerHistoryModal();
+          goToDepositPage(p.id, sug);
+        };
+      }
+
+      const content = document.getElementById('historyModalContent');
+      let html = '';
+
+      // 1. All Deposits of this player
+      const playerDeps = allDeposits.filter(d => d.playerId === p.id);
+      const matchDeps = [];
+      matches.forEach(m => {
+        const rec = p.matchRecords && p.matchRecords[m.id];
+        if (rec && (rec.addedDeposit || 0) > 0) {
+          matchDeps.push({ match: m, amount: rec.addedDeposit });
+        }
+      });
+
+      const totalDepEvents = playerDeps.length + matchDeps.length + (p.initialDeposit > 0 ? 1 : 0);
+      html += `<div class="font-bold text-slate-800 uppercase text-[11px] tracking-wider mb-1">1. Lịch sử các lần đóng quỹ (${totalDepEvents} lần)</div>`;
+
+      if (p.initialDeposit > 0) {
+        html += `
+          <div class="flex justify-between items-center p-2.5 rounded-xl bg-amber-50/70 border border-amber-200/80">
+            <span>Số dư quỹ ban đầu</span>
+            <span class="font-bold text-amber-700 tabular-nums">+${fmtMoney(p.initialDeposit)}</span>
+          </div>
+        `;
+      }
+
+      playerDeps.forEach(d => {
+        const dStr = d.depositDate ? d.depositDate.split('T')[0] : '';
+        html += `
+          <div class="flex justify-between items-center p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70">
+            <div>
+              <div class="font-bold text-slate-800">${d.note || 'Đóng quỹ CLB'}</div>
+              <div class="text-[11px] text-slate-500">Ngày: ${dStr}</div>
+            </div>
+            <span class="font-bold text-emerald-700 tabular-nums">+${fmtMoney(d.amount)}</span>
+          </div>
+        `;
+      });
+
+      matchDeps.forEach(md => {
+        const d = new Date(md.match.matchDate);
+        const dayStr = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+        html += `
+          <div class="flex justify-between items-center p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70">
+            <div>
+              <div class="font-bold text-slate-800">Đóng trực tiếp tại ${md.match.title || 'Trận CN'}</div>
+              <div class="text-[11px] text-slate-500">Ngày: ${dayStr}</div>
+            </div>
+            <span class="font-bold text-emerald-700 tabular-nums">+${fmtMoney(md.amount)}</span>
+          </div>
+        `;
+      });
+
+      if (totalDepEvents === 0) {
+        html += `<div class="p-3 rounded-xl bg-slate-50 text-slate-400 text-center">Thành viên này chưa có lần đóng quỹ nào</div>`;
+      }
+
+      // 2. Match fee usage
+      html += `<div class="font-bold text-slate-800 uppercase text-[11px] tracking-wider mt-4 mb-1">2. Lịch sử tham gia trận đấu &amp; trừ quỹ</div>`;
+      let hasAnyMatch = false;
+      matches.forEach(m => {
+        const rec = p.matchRecords && p.matchRecords[m.id];
+        if (rec && rec.feeCharged > 0) {
+          hasAnyMatch = true;
+          const d = new Date(m.matchDate);
+          const dayStr = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+          html += `
+            <div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+              <div>
+                <div class="font-bold text-slate-900">${m.title || 'Trận CN'} (${dayStr})</div>
+                <div class="text-[11px] text-slate-500">${m.stadiumName || 'Sân 6h50'} ${rec.hasDrinks ? '• Có uống nước (+10k)' : ''}</div>
+              </div>
+              <div class="font-bold text-rose-600 tabular-nums">-${fmtMoney(rec.feeCharged)}</div>
+            </div>
+          `;
+        }
+      });
+
+      if (!hasAnyMatch) {
+        html += `<div class="p-3 rounded-xl bg-slate-50 text-slate-400 text-center">Chưa có phát sinh trừ tiền trận đấu nào</div>`;
+      }
+
+      content.innerHTML = html;
+      document.getElementById('modalPlayerHistory').classList.remove('hidden');
+    }
+
+    function closePlayerHistoryModal() {
+      document.getElementById('modalPlayerHistory').classList.add('hidden');
+    }
+
+    // ==================== MATRIX CELL EDITING & SAVE (ADMIN ONLY) ====================
+    function onMatrixCellChange(matchId, playerId, field, val) {
+      if (!isAdmin()) {
+        showToast('Chỉ Admin mới được chỉnh sửa số tiền trên bảng!', 'lock', true);
+        renderMatrixSheet();
+        return;
+      }
+      const numVal = (parseFloat(val) || 0) * 1000;
+      const key = `${matchId}_${playerId}`;
+      if (!pendingUpdates[key]) {
+        const currentRec = players.find(p => p.id === playerId)?.matchRecords?.[matchId] || {};
+        pendingUpdates[key] = {
+          matchId,
+          playerId,
+          addedDeposit: currentRec.addedDeposit || 0,
+          feeCharged: currentRec.feeCharged || 0,
+        };
+      }
+      pendingUpdates[key][field] = numVal;
+
+      const player = players.find(p => p.id === playerId);
+      if (player) {
+        if (!player.matchRecords) player.matchRecords = {};
+        if (!player.matchRecords[matchId]) player.matchRecords[matchId] = { feeCharged: 0, addedDeposit: 0 };
+        player.matchRecords[matchId][field] = numVal;
+      }
+
+      const ind = document.getElementById('saveStatusIndicator');
+      if (ind) {
+        ind.innerHTML = `<span class="material-symbols-outlined text-[14px]">sync_problem</span> Chưa lưu (Nhấn Lưu)`;
+        ind.className = "inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200 font-bold";
+      }
+
+      const btn = document.getElementById('btnGlobalSave');
+      if (btn) {
+        btn.className = "admin-only-el inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow-md transition-all animate-bounce";
+      }
+    }
+
+    async function saveAllChanges() {
+      if (!isAdmin()) return;
+      const updates = Object.values(pendingUpdates);
+      const btn = document.getElementById('btnGlobalSave');
+      const ind = document.getElementById('saveStatusIndicator');
+      const btnText = document.getElementById('btnSaveText');
+
+      btn.disabled = true;
+      if (btnText) btnText.textContent = "Đang lưu...";
+
+      try {
+        if (updates.length > 0) {
+          await fetch('/api/batch-save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ updates })
+          });
+          pendingUpdates = {};
+        }
+
+        await initData();
+        showToast("Đã lưu toàn bộ dữ liệu vào sổ quỹ!", "verified");
+        if (ind) {
+          ind.innerHTML = `<span class="material-symbols-outlined text-[14px]">done_all</span> Đã đồng bộ`;
+          ind.className = "inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 font-semibold";
+        }
+        btn.className = "admin-only-el inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all";
+        btn.classList.remove('animate-bounce');
+      } catch (err) {
+        showToast("Lỗi khi lưu dữ liệu!", "error", true);
+      } finally {
+        btn.disabled = false;
+        if (btnText) btnText.textContent = "Lưu";
+      }
+    }
+
+    // Export Matrix to CSV/Excel
+    function exportMatrixToExcel() {
+      const visibleMatches = getVisibleMatches();
+      let csv = '\uFEFF';
+      const headers = ['STT', 'Họ và Tên', 'Biệt danh'];
+      visibleMatches.forEach(m => {
+        const d = new Date(m.matchDate);
+        const dayStr = `${d.getDate()}/${d.getMonth() + 1}`;
+        headers.push(`Trừ ${m.title || dayStr} (VNĐ)`);
+        headers.push(`Đóng tại trận ${m.title || dayStr} (VNĐ)`);
+      });
+      headers.push('Tổng Đã Đóng (VNĐ)', 'Tổng Đã Dùng (VNĐ)', 'Số Dư Quỹ (VNĐ)');
+      csv += headers.map(h => `"${h}"`).join(',') + '\n';
+
+      players.forEach((p, idx) => {
+        const row = [idx + 1, p.name, p.nickname || ''];
+        visibleMatches.forEach(m => {
+          const rec = (p.matchRecords && p.matchRecords[m.id]) || { feeCharged: 0, addedDeposit: 0 };
+          row.push(rec.feeCharged || 0);
+          row.push(rec.addedDeposit || 0);
+        });
+        row.push(p.totalPaid || 0, p.totalUsed || 0, p.balance || 0);
+        csv += row.map(c => `"${c}"`).join(',') + '\n';
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `So_Quy_FC_6H_Sang_Chu_Nhat.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Đã xuất file Excel (CSV) sổ theo dõi đóng quỹ!', 'file_download');
+    }
+
+    // ==================== TAB 3: MATCH ATTENDANCE VIEW ====================
+    function renderMatchesSelector() {
+      const sel = document.getElementById('matchSelector');
+      if (!sel) return;
+      sel.innerHTML = '';
+      matches.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = `${m.title || 'Trận CN'} (${m.attendingCount || 0} người đá)`;
+        sel.appendChild(opt);
+      });
+
+      if (matches.length > 0) {
+        if (!selectedMatchId) selectedMatchId = matches[matches.length - 1].id;
+        sel.value = selectedMatchId;
+        loadMatchDetails(selectedMatchId);
+      }
+    }
+
+    function onSelectMatch(matchId) {
+      selectedMatchId = matchId;
+      loadMatchDetails(matchId);
+    }
+
+    let currentMatchData = null;
+
+    async function loadMatchDetails(matchId) {
+      try {
+        const res = await fetch(`/api/matches/${matchId}`).then(r => r.json());
+        currentMatchData = res;
+
+        document.getElementById('inputPitchFee').value = res.pitchFee || 0;
+        document.getElementById('inputDrinkPrice').value = res.defaultDrinkPerPerson || 10000;
+
+        if (res.matchDate) {
+          const dt = new Date(res.matchDate);
+          const yyyy = dt.getFullYear();
+          const mm = String(dt.getMonth() + 1).padStart(2, '0');
+          const dd = String(dt.getDate()).padStart(2, '0');
+          const hh = String(dt.getHours()).padStart(2, '0');
+          const min = String(dt.getMinutes()).padStart(2, '0');
+          document.getElementById('inputMatchDate').value = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+        }
+
+        renderAttendanceRows();
+        recalcMatchLive();
+      } catch (err) {
+        console.error("Lỗi khi tải chi tiết trận:", err);
+      }
+    }
+
+    function renderAttendanceRows() {
+      const container = document.getElementById('matchAttendanceList');
+      if (!container || !currentMatchData) return;
+      container.innerHTML = '';
+      document.getElementById('matchTotalPlayersCount').textContent = currentMatchData.records.length;
+      const dis = isAdmin() ? '' : 'disabled';
+
+      currentMatchData.records.forEach(rec => {
+        const row = document.createElement('div');
+        row.className = `p-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3 transition ${rec.isPresent ? 'bg-emerald-50/40 border-l-4 border-emerald-500' : 'bg-white hover:bg-slate-50'}`;
+        row.id = `att-row-${rec.playerId}`;
+
+        row.innerHTML = `
+          <div class="flex items-center gap-3 min-w-[180px]">
+            <input type="checkbox" ${dis}
+                   id="chk-present-${rec.playerId}"
+                   ${rec.isPresent ? 'checked' : ''}
+                   onchange="onAttendanceToggle('${rec.playerId}')"
+                   class="w-4 h-4 text-emerald-600 rounded border-slate-300 cursor-pointer focus:ring-emerald-500"/>
+            <label for="chk-present-${rec.playerId}" class="cursor-pointer select-none">
+              <div class="font-bold text-slate-900 text-sm">${rec.playerName}</div>
+              ${rec.playerNickname ? `<div class="text-xs text-slate-500">(${rec.playerNickname})</div>` : ''}
+            </label>
+          </div>
+
+          <div class="flex items-center gap-2 bg-amber-50/70 px-3 py-1.5 rounded-xl border border-amber-200/80">
+            <input type="checkbox" ${dis}
+                   id="chk-drink-${rec.playerId}"
+                   ${rec.hasDrinks ? 'checked' : ''}
+                   onchange="onDrinksToggle('${rec.playerId}')"
+                   class="w-4 h-4 text-amber-600 rounded border-amber-300 cursor-pointer focus:ring-amber-500"/>
+            <label for="chk-drink-${rec.playerId}" class="text-xs font-semibold text-amber-900 cursor-pointer select-none flex items-center gap-1">
+              <span class="material-symbols-outlined text-[15px] text-amber-600">local_drink</span> Uống nước (+10k)
+            </label>
+          </div>
+
+          <div class="flex items-center gap-1.5 text-xs">
+            <span class="text-slate-500 font-medium">Trừ:</span>
+            <input type="number" ${dis}
+                   id="fee-${rec.playerId}"
+                   value="${rec.feeCharged || 0}"
+                   step="5000"
+                   oninput="recalcMatchLive()"
+                   class="w-24 text-center text-xs font-bold font-mono py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-rose-600 focus:border-emerald-500 focus:outline-none"/>
+            <span class="text-slate-400">đ</span>
+          </div>
+
+          <div class="flex items-center gap-1.5 text-xs">
+            <span class="text-emerald-700 font-bold">Đóng tại sân:</span>
+            <div class="relative">
+              <span class="absolute left-2.5 top-1.5 text-emerald-600 font-bold">+</span>
+              <input type="number" ${dis}
+                     id="add-${rec.playerId}"
+                     value="${rec.addedDeposit || 0}"
+                     step="10000"
+                     oninput="recalcMatchLive()"
+                     placeholder="0"
+                     class="w-24 pl-5 text-center text-xs font-bold font-mono py-1.5 rounded-lg border border-emerald-200 bg-emerald-50/50 text-emerald-700 focus:border-emerald-500 focus:outline-none"/>
+            </div>
+            <span class="text-slate-400">đ</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function toggleSelectAllAttendance(selectAll) {
+      if (!isAdmin() || !currentMatchData) return;
+      currentMatchData.records.forEach(rec => {
+        const chk = document.getElementById(`chk-present-${rec.playerId}`);
+        const row = document.getElementById(`att-row-${rec.playerId}`);
+        if (chk) chk.checked = selectAll;
+        if (row) {
+          row.className = selectAll
+            ? "p-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3 transition bg-emerald-50/40 border-l-4 border-emerald-500"
+            : "p-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3 transition bg-white hover:bg-slate-50";
+        }
+      });
+      autoSplitPitchFee();
+    }
+
+    function onAttendanceToggle(playerId) {
+      if (!isAdmin()) return;
+      const chk = document.getElementById(`chk-present-${playerId}`);
+      const row = document.getElementById(`att-row-${playerId}`);
+      if (chk.checked) {
+        row.className = "p-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3 transition bg-emerald-50/40 border-l-4 border-emerald-500";
+      } else {
+        row.className = "p-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3 transition bg-white hover:bg-slate-50";
+        const chkDrink = document.getElementById(`chk-drink-${playerId}`);
+        if (chkDrink) chkDrink.checked = false;
+      }
+      autoSplitPitchFee();
+    }
+
+    function onDrinksToggle(playerId) {
+      if (!isAdmin()) return;
+      const chkDrink = document.getElementById(`chk-drink-${playerId}`);
+      const chkPresent = document.getElementById(`chk-present-${playerId}`);
+      if (chkDrink.checked && !chkPresent.checked) {
+        chkPresent.checked = true;
+        document.getElementById(`att-row-${playerId}`).className = "p-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3 transition bg-emerald-50/40 border-l-4 border-emerald-500";
+      }
+      autoSplitPitchFee();
+    }
+
+    function autoSplitPitchFee() {
+      if (!currentMatchData || !currentMatchData.records) return;
+      const totalPitchFee = parseFloat(document.getElementById('inputPitchFee').value) || 0;
+      const drinkPrice = parseFloat(document.getElementById('inputDrinkPrice').value) || 10000;
+
+      let attendingCount = 0;
+      currentMatchData.records.forEach(rec => {
+        if (document.getElementById(`chk-present-${rec.playerId}`)?.checked) attendingCount++;
+      });
+
+      const pitchShare = attendingCount > 0 ? Math.round((totalPitchFee / attendingCount) / 1000) * 1000 : 0;
+
+      currentMatchData.records.forEach(rec => {
+        const isPresent = document.getElementById(`chk-present-${rec.playerId}`)?.checked;
+        const hasDrinks = document.getElementById(`chk-drink-${rec.playerId}`)?.checked;
+        const feeInput = document.getElementById(`fee-${rec.playerId}`);
+        if (feeInput) {
+          feeInput.value = isPresent ? (pitchShare + (hasDrinks ? drinkPrice : 0)) : 0;
+        }
+      });
+
+      recalcMatchLive();
+    }
+
+    function recalcMatchLive() {
+      if (!currentMatchData || !currentMatchData.records) return;
+      let attending = 0, drinking = 0, totalFee = 0, totalAdded = 0;
+
+      currentMatchData.records.forEach(rec => {
+        const isPresent = document.getElementById(`chk-present-${rec.playerId}`)?.checked;
+        const hasDrinks = document.getElementById(`chk-drink-${rec.playerId}`)?.checked;
+        const fee = parseFloat(document.getElementById(`fee-${rec.playerId}`)?.value) || 0;
+        const added = parseFloat(document.getElementById(`add-${rec.playerId}`)?.value) || 0;
+
+        if (isPresent) attending++;
+        if (hasDrinks) drinking++;
+        totalFee += fee;
+        totalAdded += added;
+      });
+
+      document.getElementById('liveAttendingCount').textContent = attending;
+      document.getElementById('liveDrinksCount').textContent = drinking;
+      document.getElementById('liveTotalFee').textContent = fmtMoney(totalFee);
+      document.getElementById('liveTotalAdded').textContent = fmtMoney(totalAdded);
+    }
+
+    async function saveCurrentMatchDetails() {
+      if (!isAdmin() || !selectedMatchId || !currentMatchData) return;
+
+      const pitchFee = parseFloat(document.getElementById('inputPitchFee').value) || 0;
+      const defaultDrink = parseFloat(document.getElementById('inputDrinkPrice').value) || 10000;
+      const matchDate = document.getElementById('inputMatchDate').value;
+
+      const playerRecords = currentMatchData.records.map(rec => {
+        const isPresent = document.getElementById(`chk-present-${rec.playerId}`)?.checked || false;
+        const hasDrinks = document.getElementById(`chk-drink-${rec.playerId}`)?.checked || false;
+        const feeCharged = parseFloat(document.getElementById(`fee-${rec.playerId}`)?.value) || 0;
+        const addedDeposit = parseFloat(document.getElementById(`add-${rec.playerId}`)?.value) || 0;
+
+        return {
+          playerId: rec.playerId,
+          isPresent,
+          hasDrinks,
+          drinkAmount: hasDrinks ? defaultDrink : 0,
+          pitchShare: isPresent ? Math.max(0, feeCharged - (hasDrinks ? defaultDrink : 0)) : 0,
+          feeCharged,
+          addedDeposit,
+        };
+      });
+
+      try {
+        await fetch(`/api/matches/${selectedMatchId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pitchFee, defaultDrinkPerPerson: defaultDrink, matchDate, playerRecords })
+        });
+
+        showToast("Đã lưu điểm danh & kết quả trận!", "verified");
+        await initData();
+      } catch (err) {
+        showToast("Lỗi khi lưu trận đấu!", "error", true);
+      }
+    }
+
+    // ==================== TAB 4: MEMBERS & HISTORY CARDS ====================
+    function renderMembersTab() {
+      const grid = document.getElementById('membersCardGrid');
+      const debtorsGrid = document.getElementById('debtorsListGrid');
+      const debtorsSec = document.getElementById('debtorsSection');
+      if (!grid) return;
+      document.getElementById('membersTotalCount').textContent = players.length;
+
+      grid.innerHTML = '';
+      debtorsGrid.innerHTML = '';
+
+      const debtors = players.filter(p => p.balance < 0);
+      if (debtors.length === 0) {
+        debtorsSec.classList.add('hidden');
+      } else {
+        debtorsSec.classList.remove('hidden');
+        debtors.forEach(d => {
+          const item = document.createElement('div');
+          item.className = "rounded-xl bg-white p-3.5 border border-rose-200 shadow-xs flex items-center justify-between text-xs";
+          item.innerHTML = `
+            <div>
+              <div class="font-bold text-slate-900 text-sm">${d.name}</div>
+              <div class="font-mono text-rose-600 font-extrabold text-sm mt-0.5">${fmtMoney(d.balance)}</div>
+            </div>
+            <button onclick="goToDepositPage('${d.id}', ${Math.abs(d.balance)})" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs flex items-center gap-1 transition">
+              <span class="material-symbols-outlined text-[14px]">payments</span> Đóng bù
+            </button>
+          `;
+          debtorsGrid.appendChild(item);
+        });
+      }
+
+      players.forEach((p, idx) => {
+        const card = document.createElement('div');
+        const isDebt = p.balance < 0;
+        const isCredit = p.balance > 0;
+        const numStr = String(p.displayOrder || (idx + 1)).padStart(2, '0');
+        const playerDirectDeps = allDeposits.filter(d => d.playerId === p.id);
+
+        card.className = `rounded-2xl bg-white border ${isDebt ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200/90'} p-5 space-y-3 text-xs shadow-sm hover:border-emerald-300 transition`;
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">#${numStr}</span>
+                <span class="font-bold text-base text-slate-900">${p.name}</span>
+              </div>
+              <div class="text-xs text-slate-500 mt-1">${p.nickname || 'Thành viên CLB'}</div>
+            </div>
+            <span class="inline-block px-2.5 py-1 rounded-full text-xs font-extrabold tabular-nums border ${isDebt ? 'bg-rose-100 text-rose-800 border-rose-300' : isCredit ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-200'}">
+              ${(p.balance > 0 ? '+' : '') + fmtMoney(p.balance)}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100 tabular-nums text-xs">
+            <div>
+              <span class="text-slate-400 text-[10px] font-bold uppercase">TỔNG ĐÃ ĐÓNG:</span>
+              <div class="font-bold text-amber-700 mt-0.5">${fmtMoney(p.totalPaid)} (${playerDirectDeps.length} lần)</div>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[10px] font-bold uppercase">ĐÃ TRỪ SÂN/NƯỚC:</span>
+              <div class="font-bold text-rose-600 mt-0.5">${fmtMoney(p.totalUsed)}</div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs">
+            <div class="flex items-center gap-1.5">
+              <button onclick="goToDepositPage('${p.id}', ${isDebt ? Math.abs(p.balance) : 0})" class="font-bold px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg flex items-center gap-1 transition">
+                <span class="material-symbols-outlined text-[15px]">payments</span> Đóng quỹ
+              </button>
+              <button onclick="openPlayerHistoryModal('${p.id}')" class="font-semibold px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200 flex items-center gap-1 transition">
+                <span class="material-symbols-outlined text-[15px]">history</span> Lịch sử
+              </button>
+            </div>
+            ${isAdmin() ? `
+              <div class="space-x-2">
+                <button onclick="openEditPlayerModal('${p.id}')" class="text-slate-500 hover:text-emerald-700 font-semibold transition">Sửa</button>
+                <button onclick="handleDeletePlayer('${p.id}', '${p.name}')" class="text-slate-400 hover:text-rose-600 font-semibold transition">Xóa</button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // ==================== TAB 5: SCHEDULE TAB ====================
+    function renderScheduleTab() {
+      const tbody = document.getElementById('scheduleTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      matches.forEach(m => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition-colors";
+        const d = new Date(m.matchDate);
+        const dayLabel = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+        const isHidden = hiddenMatchIds.has(m.id);
+
+        tr.innerHTML = `
+          <td class="p-4 font-bold text-slate-900">${m.title || 'Trận đấu'}</td>
+          <td class="p-4 font-mono text-emerald-700 font-semibold">CN ${dayLabel} (${m.timeSlot || '06:00 - 07:30'})</td>
+          <td class="p-4 text-slate-600">${m.stadiumName || 'Sân bóng 6h50'}</td>
+          <td class="p-4 text-center font-bold text-slate-900">${m.attendingCount || 0} người</td>
+          <td class="p-4 text-right font-mono font-bold text-amber-700">${fmtMoney(m.pitchFee)}</td>
+          <td class="p-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.attendingCount > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">
+              ${m.attendingCount > 0 ? 'Đã đá' : 'Đang ĐK'}
+            </span>
+          </td>
+          <td class="p-4 text-center">
+            <button onclick="toggleHideSingleMatch('${m.id}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold border ${isHidden ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-700 border-slate-200'} transition">
+              ${isHidden ? 'Đang ẩn' : 'Đang hiện'}
+            </button>
+          </td>
+          <td class="p-4 text-center space-x-2">
+            <button onclick="onSelectMatch('${m.id}'); switchTab('match');" class="text-emerald-600 hover:text-emerald-800 font-bold" title="Xem điểm danh trận này">
+              <span class="material-symbols-outlined text-[19px]">checklist</span>
+            </button>
+            ${isAdmin() ? `
+              <button onclick="handleDeleteMatch('${m.id}', '${m.title}')" class="text-slate-400 hover:text-rose-600" title="Xóa trận">
+                <span class="material-symbols-outlined text-[19px]">delete</span>
+              </button>
+            ` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function handleDeleteMatch(matchId, matchTitle) {
+      if (!isAdmin()) return;
+      if (!confirm(`Xác nhận xóa trận "${matchTitle}"?`)) return;
+      try {
+        await fetch(`/api/matches/${matchId}`, { method: 'DELETE' });
+        showToast(`Đã xóa trận ${matchTitle}!`, "delete");
+        await initData();
+      } catch (err) {
+        showToast("Lỗi khi xóa trận đấu!", "error", true);
+      }
+    }
+
+    // ==================== TAB SWITCHER ====================
+    function switchTab(tab) {
+      const allTabs = ['matrix', 'deposits', 'match', 'members', 'schedule'];
+      allTabs.forEach(t => {
+        const sec = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+        const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (sec) sec.classList.add('hidden');
+        if (btn) {
+          btn.className = "whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all flex items-center gap-1";
+        }
+      });
+
+      const activeSec = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+      const activeBtn = document.getElementById('tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1));
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.className = "whitespace-nowrap px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold shadow-xs transition-all flex items-center gap-1";
+      }
+
+      if (tab === 'deposits') renderDepositsTab();
+      if (tab === 'schedule') renderScheduleTab();
+      if (tab === 'match') renderAttendanceRows();
+      if (tab === 'members') renderMembersTab();
+    }
+
+    // ==================== MODALS: VISIBILITY, MATCH, PLAYER, ZALO ====================
+    function openToggleMatchesModal() {
+      const container = document.getElementById('matchVisibilityChecklist');
+      container.innerHTML = '';
+      matches.forEach(m => {
+        const isVisible = !hiddenMatchIds.has(m.id);
+        const d = new Date(m.matchDate);
+        const dayLabel = `${d.getDate()}/${d.getMonth() + 1}`;
+
+        const row = document.createElement('label');
+        row.className = "flex items-center justify-between p-2.5 hover:bg-white cursor-pointer rounded-lg select-none transition";
+        row.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <input type="checkbox" id="vis-${m.id}" ${isVisible ? 'checked' : ''} class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"/>
+            <span class="font-bold text-slate-800 text-xs">${m.title || 'Trận CN ' + dayLabel}</span>
+          </div>
+          <span class="text-[11px] text-emerald-700 font-mono font-semibold">CN ${dayLabel}</span>
+        `;
+        container.appendChild(row);
+      });
+      document.getElementById('modalToggleMatches').classList.remove('hidden');
+    }
+
+    function closeToggleMatchesModal() {
+      document.getElementById('modalToggleMatches').classList.add('hidden');
+    }
+
+    function selectAllMatchesVisibility(showAll) {
+      matches.forEach(m => {
+        const chk = document.getElementById(`vis-${m.id}`);
+        if (chk) chk.checked = showAll;
+      });
+    }
+
+    function applyMatchesVisibility() {
+      hiddenMatchIds.clear();
+      matches.forEach(m => {
+        const chk = document.getElementById(`vis-${m.id}`);
+        if (chk && !chk.checked) hiddenMatchIds.add(m.id);
+      });
+      matrixFilterMode = 'custom';
+      closeToggleMatchesModal();
+      renderMatrixSheet();
+      renderScheduleTab();
+    }
+
+    function checkMatchDuplicateWarning() {
+      const matchDate = document.getElementById('newMatchDate').value;
+      const timeSlot = document.getElementById('newMatchTimeSlot').value.trim();
+      const warn = document.getElementById('duplicateWarningText');
+      const submitBtn = document.getElementById('btnSubmitNewMatch');
+
+      if (!matchDate) {
+        warn.classList.add('hidden');
+        submitBtn.disabled = false;
+        return;
+      }
+
+      const datePrefix = matchDate.substring(0, 10);
+      const isDuplicate = matches.some(m => {
+        const mDatePrefix = (m.matchDate || '').substring(0, 10);
+        return mDatePrefix === datePrefix && (m.timeSlot || '').trim() === timeSlot;
+      });
+
+      if (isDuplicate) {
+        warn.textContent = `⚠️ Đã có trận đấu diễn ra vào ngày này lúc ${timeSlot}! Không thể tạo 2 trận trùng ngày giờ.`;
+        warn.classList.remove('hidden');
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        warn.classList.add('hidden');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    function openAddMatchModal() {
+      if (!isAdmin()) {
+        showToast('Chỉ Admin mới có quyền tạo trận đấu mới!', 'lock', true);
+        return;
+      }
+      const today = new Date();
+      const day = today.getDay();
+      const diff = (7 - day) % 7 || 7;
+      const nextSunday = new Date(today);
+      nextSunday.setDate(today.getDate() + diff);
+      nextSunday.setHours(6, 0, 0, 0);
+
+      const yyyy = nextSunday.getFullYear();
+      const mm = String(nextSunday.getMonth() + 1).padStart(2, '0');
+      const dd = String(nextSunday.getDate()).padStart(2, '0');
+      document.getElementById('newMatchDate').value = `${yyyy}-${mm}-${dd}T06:00`;
+      document.getElementById('newMatchTitle').value = `Trận CN ${nextSunday.getDate()}/${nextSunday.getMonth() + 1}`;
+
+      checkMatchDuplicateWarning();
+      document.getElementById('modalMatch').classList.remove('hidden');
+    }
+
+    function closeMatchModal() {
+      document.getElementById('modalMatch').classList.add('hidden');
+    }
+
+    async function handleSaveNewMatch(e) {
+      e.preventDefault();
+      if (!isAdmin()) return;
+      const title = document.getElementById('newMatchTitle').value.trim();
+      const matchDate = document.getElementById('newMatchDate').value;
+      const timeSlot = document.getElementById('newMatchTimeSlot').value;
+      const stadiumName = document.getElementById('newMatchStadium').value;
+      const pitchFee = parseFloat(document.getElementById('newMatchPitchFee').value) || 300000;
+      const defaultDrink = parseFloat(document.getElementById('newMatchDrinkFee').value) || 10000;
+
+      try {
+        const res = await fetch('/api/matches', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, matchDate, timeSlot, stadiumName, pitchFee, defaultDrinkPerPerson: defaultDrink })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showToast(data.error || "Không thể tạo trận trùng ngày giờ!", "warning", true);
+          return;
+        }
+        showToast(`Đã tạo ${title}!`, "sports_soccer");
+        closeMatchModal();
+        selectedMatchId = data.id;
+        await initData();
+      } catch (err) {
+        showToast("Lỗi khi tạo trận đấu!", "error", true);
+      }
+    }
+
+    function openAddPlayerModal() {
+      if (!isAdmin()) {
+        showToast('Chỉ Admin mới được thêm thành viên mới!', 'lock', true);
+        return;
+      }
+      document.getElementById('editPlayerId').value = '';
+      document.getElementById('modalPlayerTitle').innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-[20px]">person_add</span> Thêm thành viên mới`;
+      document.getElementById('formPlayer').reset();
+      document.getElementById('initialDepositGroup').style.display = 'block';
+      document.getElementById('modalPlayer').classList.remove('hidden');
+    }
+
+    function openEditPlayerModal(playerId) {
+      if (!isAdmin()) return;
+      const p = players.find(x => x.id === playerId);
+      if (!p) return;
+      document.getElementById('editPlayerId').value = p.id;
+      document.getElementById('modalPlayerTitle').innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-[20px]">edit</span> Sửa thông tin: ${p.name}`;
+      document.getElementById('inputPlayerName').value = p.name;
+      document.getElementById('inputPlayerNickname').value = p.nickname || '';
+      document.getElementById('inputPlayerPhone').value = p.phoneNumber || '';
+      document.getElementById('inputPlayerDeposit').value = p.initialDeposit || 0;
+      document.getElementById('initialDepositGroup').style.display = 'none';
+      document.getElementById('modalPlayer').classList.remove('hidden');
+    }
+
+    function closePlayerModal() {
+      document.getElementById('modalPlayer').classList.add('hidden');
+    }
+
+    async function handleSavePlayer(e) {
+      e.preventDefault();
+      if (!isAdmin()) return;
+      const id = document.getElementById('editPlayerId').value;
+      const name = document.getElementById('inputPlayerName').value.trim();
+      const nickname = document.getElementById('inputPlayerNickname').value.trim();
+      const phoneNumber = document.getElementById('inputPlayerPhone').value.trim();
+      const initialDeposit = parseFloat(document.getElementById('inputPlayerDeposit').value) || 0;
+
+      try {
+        if (id) {
+          await fetch(`/api/players/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, nickname, phoneNumber })
+          });
+          showToast(`Đã cập nhật ${name}!`);
+        } else {
+          await fetch('/api/players', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, nickname, phoneNumber, initialDeposit })
+          });
+          showToast(`Đã thêm thành viên ${name}!`, "person_add");
+        }
+        closePlayerModal();
+        await initData();
+      } catch (err) {
+        showToast("Lỗi khi lưu thành viên!", "error", true);
+      }
+    }
+
+    async function handleDeletePlayer(playerId, playerName) {
+      if (!isAdmin()) return;
+      if (!confirm(`Xác nhận xóa thành viên "${playerName}"?`)) return;
+      try {
+        await fetch(`/api/players/${playerId}`, { method: 'DELETE' });
+        showToast(`Đã xóa ${playerName}!`, "delete");
+        await initData();
+      } catch (err) {
+        showToast("Lỗi khi xóa thành viên!", "error", true);
+      }
+    }
+
+    function copyTransferInfo() {
+      navigator.clipboard?.writeText(`0362226752 PHAM TRONG CANH FC6H DONG QUY`);
+      showToast('Đã sao chép STK 0362226752 (PHAM TRONG CANH)!', 'content_copy');
+    }
+
+    function openZaloModal() {
+      const totalInitial = players.reduce((s, p) => s + (p.initialDeposit || 0), 0);
+      const totalAdded = players.reduce((s, p) => s + (p.totalAddedDeposit || 0), 0);
+      const totalDirect = players.reduce((s, p) => s + (p.totalDirectDeposit || 0), 0);
+      const totalPaid = totalInitial + totalAdded + totalDirect;
+      const totalUsed = players.reduce((s, p) => s + (p.totalUsed || 0), 0);
+      const balance = totalPaid - totalUsed;
+      const debtors = players.filter(p => (p.balance || 0) < 0);
+      const now = new Date();
+
+      let text = `⚽ THEO DÕI ĐÓNG QUỸ FC 6H SÁNG CHỦ NHẬT\n`;
+      text += `📅 Ngày: ${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}\n`;
+      text += `------------------------------------\n`;
+      text += `💰 Tổng đã đóng: ${fmtMoney(totalPaid)}\n`;
+      text += `🏟️ Tổng đã chi: ${fmtMoney(totalUsed)}\n`;
+      text += `🏦 Quỹ CLB hiện còn: ${(balance > 0 ? '+' : '') + fmtMoney(balance)}\n\n`;
+
+      if (debtors.length > 0) {
+        text += `⚠️ THÀNH VIÊN CHƯA ĐÓNG / CẦN ĐÓNG BÙ (${debtors.length} người):\n`;
+        debtors.forEach(d => {
+          text += `• ${d.name}: ${fmtMoney(d.balance)}\n`;
+        });
+        text += `\n💳 STK THỦ QUỸ: ${clubConfig.bankAccount} (${clubConfig.accountHolder})\n`;
+      } else {
+        text += `✨ Tất cả thành viên trong CLB đều đã đóng đủ quỹ!\n`;
+      }
+
+      document.getElementById('zaloReportText').value = text;
+      document.getElementById('copyToast').classList.add('opacity-0');
+      document.getElementById('modalZalo').classList.remove('hidden');
+    }
+
+    function closeZaloModal() {
+      document.getElementById('modalZalo').classList.add('hidden');
+    }
+
+    function copyZaloText() {
+      const ta = document.getElementById('zaloReportText');
+      ta.select();
+      navigator.clipboard.writeText(ta.value).then(() => {
+        const toast = document.getElementById('copyToast');
+        toast.classList.remove('opacity-0');
+        setTimeout(() => toast.classList.add('opacity-0'), 2500);
+        showToast('Đã sao chép báo cáo Zalo!', 'content_copy');
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', initData);
+  </script>
+</body>
+</html>

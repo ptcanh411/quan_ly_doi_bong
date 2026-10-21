@@ -1,0 +1,81 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Player {
+  id              String            @id @default(uuid())
+  name            String
+  nickname        String?
+  phoneNumber     String?
+  initialDeposit  Float             @default(0)
+  isActive        Boolean           @default(true)
+  displayOrder    Int               @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  matchRecords    MatchPlayerRecord[]
+  deposits        DepositTransaction[]
+}
+
+model Match {
+  id                    String            @id @default(uuid())
+  matchDate             DateTime
+  title                 String?
+  timeSlot              String            @default("06:00 - 07:30")
+  stadiumName           String?           @default("Sân bóng 6h50")
+  pitchFee              Float             @default(0)
+  drinksFee             Float             @default(0)
+  defaultDrinkPerPerson Float             @default(10000)
+  totalCost             Float             @default(0)
+  status                String            @default("SCHEDULED")
+  notes                 String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  records               MatchPlayerRecord[]
+}
+
+model MatchPlayerRecord {
+  id              String            @id @default(uuid())
+  matchId         String
+  playerId        String
+  isPresent       Boolean           @default(false)
+  hasDrinks       Boolean           @default(false)
+  drinkAmount     Float             @default(0)
+  pitchShare      Float             @default(0)
+  feeCharged      Float             @default(0)
+  addedDeposit    Float             @default(0)
+  note            String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  match           Match             @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player          Player            @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([matchId, playerId])
+}
+
+model DepositTransaction {
+  id              String            @id @default(uuid())
+  playerId        String
+  amount          Float
+  depositDate     DateTime          @default(now())
+  note            String?
+  createdAt       DateTime          @default(now())
+
+  player          Player            @relation(fields: [playerId], references: [id], onDelete: Cascade)
+}
+
+model ClubConfig {
+  id              String            @id @default("default")
+  clubName        String            @default("FC 6H SÁNG CHỦ NHẬT")
+  bankCode        String            @default("MB")
+  bankAccount     String            @default("0123456789")
+  accountHolder   String            @default("NGUYEN VAN THU QUY")
+  defaultTimeSlot String            @default("06:00 - 07:30")
+}
