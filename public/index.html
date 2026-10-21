@@ -85,30 +85,30 @@
 <body class="bg-[#f8fafc] text-charcoal antialiased selection:bg-primary-wash selection:text-primary-text">
 
   <!-- ==================== HEADER & NAVIGATION (LIGHT GLASSMORPHISM) ==================== -->
-  <header class="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-border-light shadow-sm">
-    <div class="h-16 w-full px-gutter md:px-gutter-tablet lg:px-gutter-desktop max-w-[1440px] mx-auto flex items-center justify-between gap-3">
+  <header class="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-border-light shadow-xs">
+    <div class="h-14 sm:h-16 w-full px-3 sm:px-gutter md:px-gutter-tablet lg:px-gutter-desktop max-w-[1440px] mx-auto flex items-center justify-between gap-2">
       <!-- Brand -->
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center p-1.5 shadow-sm flex-shrink-0">
-          <img alt="6H FC Crest Logo" class="h-full w-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB97ASZDsISKo-RcxRcB1Vq5YoM5LpEbII5hhQjds19AcyFnL547u6Zd5SQdyhJQv8ZslQTZGz54qeE1IqY-7FnH914Y74cLM7PLkmcGVHU1KSwrsllhYe2BFsLXWkwNAgezv1TVDv6kL0V0RREokb8UxT47RUQny6gVmOab6SgHw9Omrmr66za9kM08RST7NrY-geILkasusX7qCQCzcujeeUijeVSwA56iqmN2F5cFIpGF5qwG8Fm"/>
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div class="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center p-1 shadow-2xs flex-shrink-0">
+          <img alt="6H FC Logo" class="h-full w-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB97ASZDsISKo-RcxRcB1Vq5YoM5LpEbII5hhQjds19AcyFnL547u6Zd5SQdyhJQv8ZslQTZGz54qeE1IqY-7FnH914Y74cLM7PLkmcGVHU1KSwrsllhYe2BFsLXWkwNAgezv1TVDv6kL0V0RREokb8UxT47RUQny6gVmOab6SgHw9Omrmr66za9kM08RST7NrY-geILkasusX7qCQCzcujeeUijeVSwA56iqmN2F5cFIpGF5qwG8Fm"/>
         </div>
         <div class="flex flex-col min-w-0">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="font-bold text-base sm:text-lg text-slate-900 tracking-tight truncate">FC 6H SÁNG CHỦ NHẬT</span>
-            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-semibold uppercase">Sân 6h50</span>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="font-extrabold text-sm sm:text-base md:text-lg text-slate-900 tracking-tight truncate">FC 6H CHỦ NHẬT</span>
+            <span class="hidden md:inline-flex items-center px-1.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-semibold uppercase">Sân 6h50</span>
           </div>
-          <div class="flex items-center gap-1.5">
-            <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
-            <span class="text-[11px] text-emerald-700 font-medium">Theo dõi đóng quỹ &amp; điểm danh CLB</span>
+          <div class="hidden sm:flex items-center gap-1.5">
+            <span class="flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+            <span class="text-[11px] text-emerald-700 font-medium truncate">Theo dõi đóng quỹ &amp; điểm danh CLB</span>
           </div>
         </div>
       </div>
 
       <!-- Right Action Buttons & Auth Role Control -->
-      <div class="flex items-center gap-2 flex-shrink-0">
-        <!-- Go to Deposit Price Selection Page (No hardcoded 100k popup) -->
-        <button onclick="goToDepositPage('')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all" type="button">
-          <span class="material-symbols-outlined text-[18px]">payments</span>
+      <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+        <!-- Quick Deposit Button -->
+        <button onclick="goToDepositPage('')" class="inline-flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow-xs transition-all active:scale-95" type="button">
+          <span class="material-symbols-outlined text-[16px] sm:text-[18px]">payments</span>
           <span>+ Đóng Quỹ</span>
         </button>
 
@@ -118,48 +118,44 @@
           <span>+ Tạo trận</span>
         </button>
 
-        <button onclick="saveAllChanges()" id="btnGlobalSave" class="admin-only-el hidden inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all" type="button">
-          <span class="material-symbols-outlined text-[17px]">save</span>
-          <span id="btnSaveText">Lưu</span>
-        </button>
-
-        <button onclick="openZaloModal()" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition-all" type="button">
-          <span class="material-symbols-outlined text-[17px]">share</span>
-          <span>Báo cáo Zalo</span>
+        <button onclick="saveAllChanges()" id="btnGlobalSave" class="admin-only-el hidden inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm shadow-sm transition-all" type="button">
+          <span class="material-symbols-outlined text-[16px]">save</span>
+          <span id="btnSaveText" class="hidden sm:inline">Lưu</span>
         </button>
 
         <!-- USER / ADMIN LOGIN BADGE -->
-        <div class="flex items-center gap-1.5 pl-2 border-l border-slate-200">
-          <div id="authStatusBadge" onclick="openLoginModal()" class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition select-none">
+        <div class="flex items-center gap-1 pl-1 sm:pl-2 border-l border-slate-200">
+          <div id="authStatusBadge" onclick="openLoginModal()" class="cursor-pointer inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition select-none active:scale-95">
             <span id="authRoleIcon" class="material-symbols-outlined text-[18px] text-slate-600">person</span>
-            <div class="flex flex-col text-left">
+            <div class="hidden sm:flex flex-col text-left">
               <span id="authRoleTitle" class="text-xs font-bold text-slate-800 leading-none">Thành viên</span>
-              <span id="authRoleSub" class="text-[10px] text-slate-500 leading-none mt-0.5">Bấm để đổi quyền</span>
+              <span id="authRoleSub" class="text-[10px] text-slate-500 leading-none mt-0.5">Đổi quyền</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Sub-nav Tabs -->
-    <div class="w-full bg-slate-50/90 border-t border-slate-200/80">
+    <!-- Sub-nav Tabs (Desktop/Tablet) -->
+    <div class="hidden sm:block w-full bg-slate-50/90 border-t border-slate-200/80">
       <div class="w-full px-gutter md:px-gutter-tablet lg:px-gutter-desktop max-w-[1440px] mx-auto overflow-x-auto no-scrollbar">
         <nav class="flex items-center gap-1 py-1.5 text-xs sm:text-sm font-medium">
-          <button onclick="switchTab('matrix')" id="tabBtnMatrix" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold shadow-xs transition-all">
-            Bảng theo dõi đóng tiền (Sheets)
+          <button onclick="switchTab('matrix')" id="tabBtnMatrix" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold shadow-xs transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">grid_view</span> Bảng theo dõi đóng tiền (Sheets)
           </button>
           <button onclick="switchTab('deposits')" id="tabBtnDeposits" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">payments</span>
             <span>Chọn mức đóng quỹ &amp; Lịch sử</span>
             <span id="pendingDepositsBadge" class="hidden px-1.5 py-0.2 rounded-full bg-rose-600 text-white text-[10px] font-extrabold">0</span>
           </button>
-          <button onclick="switchTab('match')" id="tabBtnMatch" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all">
-            Điểm danh trận (Sân &amp; Nước)
+          <button onclick="switchTab('match')" id="tabBtnMatch" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">checklist</span> Điểm danh trận (Sân &amp; Nước)
           </button>
-          <button onclick="switchTab('members')" id="tabBtnMembers" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all">
-            Danh sách thành viên &amp; Lịch sử
+          <button onclick="switchTab('members')" id="tabBtnMembers" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">group</span> Danh sách thành viên
           </button>
-          <button onclick="switchTab('schedule')" id="tabBtnSchedule" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all">
-            Lịch các trận đấu
+          <button onclick="switchTab('schedule')" id="tabBtnSchedule" class="whitespace-nowrap px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">calendar_month</span> Lịch các trận đấu
           </button>
         </nav>
       </div>
@@ -167,144 +163,181 @@
   </header>
 
   <!-- ==================== MAIN WORKSPACE ==================== -->
-  <main class="w-full pt-32 pb-24 bg-[#f8fafc] min-h-screen">
-    <div class="relative w-full max-w-[1440px] mx-auto px-gutter md:px-gutter-tablet lg:px-gutter-desktop flex flex-col gap-4">
+  <main class="w-full pt-16 sm:pt-28 lg:pt-32 pb-24 bg-[#f8fafc] min-h-screen">
+    <div class="relative w-full max-w-[1440px] mx-auto px-3 sm:px-gutter md:px-gutter-tablet lg:px-gutter-desktop flex flex-col gap-3 sm:gap-4">
 
-      <!-- Role Banner Notification -->
-      <div id="roleNoticeBanner" class="bg-white border border-slate-200 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs shadow-2xs">
-        <div class="flex items-center gap-2">
-          <span id="bannerRoleBadge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold">
-            <span class="material-symbols-outlined text-[14px]">visibility</span> Chế độ Người dùng (Xem &amp; Đóng quỹ)
+      <!-- Role Banner Notification (Gọn gàng trên mobile) -->
+      <div id="roleNoticeBanner" class="bg-white border border-slate-200 rounded-xl px-3 py-2 flex items-center justify-between gap-2 text-xs shadow-2xs">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span id="bannerRoleBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[11px] truncate">
+            <span class="material-symbols-outlined text-[14px]">visibility</span> Chế độ Người dùng
           </span>
-          <span id="bannerRoleDesc" class="text-slate-600">
-            Bạn có thể xem tình trạng đóng tiền của cả đội và chọn mức giá đóng quỹ. <strong>Chỉ Admin (Thủ quỹ) mới được quyền tick xác nhận đã chuyển khoản quỹ.</strong>
+          <span id="bannerRoleDesc" class="hidden sm:inline text-slate-600 truncate">
+            Xem số dư &amp; đóng quỹ. Chỉ Admin mới được quyền tick xác nhận đã chuyển khoản quỹ.
           </span>
         </div>
-        <button onclick="openLoginModal()" id="bannerLoginBtn" class="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-1">
-          <span class="material-symbols-outlined text-[15px]">admin_panel_settings</span> Đăng nhập Admin
+        <button onclick="openLoginModal()" id="bannerLoginBtn" class="text-emerald-700 hover:text-emerald-800 font-bold underline flex items-center gap-0.5 flex-shrink-0 text-[11px] sm:text-xs">
+          <span class="material-symbols-outlined text-[14px]">admin_panel_settings</span> <span class="hidden sm:inline">Đăng nhập </span>Admin
         </button>
       </div>
 
-      <!-- ==================== 1. RÚT GỌN: THANH THEO DÕI ĐÓNG QUỸ CLB (COMPACT TRACKER BAR) ==================== -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <!-- ==================== 1. THANH THEO DÕI ĐÓNG QUỸ CLB (TỐI ƯU CỰC GỌN CHO MOBILE) ==================== -->
+      <div class="grid grid-cols-3 gap-2 sm:gap-3">
         <!-- Ô 1: Đã đóng / Đủ quỹ -->
-        <div onclick="toggleDebtOnlyFilter(false); document.getElementById('filter-debt-only').checked = false;" class="bg-white rounded-xl px-4 py-3 border border-slate-200/90 shadow-2xs flex items-center justify-between cursor-pointer hover:border-emerald-300 transition">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-[22px]">how_to_reg</span>
+        <div onclick="toggleDebtOnlyFilter(false); document.getElementById('filter-debt-only').checked = false;" class="bg-white rounded-xl p-2.5 sm:px-4 sm:py-3 border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center sm:justify-between cursor-pointer hover:border-emerald-300 transition text-center sm:text-left">
+          <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
+            <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[16px] sm:text-[22px]">how_to_reg</span>
             </div>
             <div>
-              <div class="text-[11px] font-bold text-slate-400 uppercase">ĐÃ ĐÓNG / ĐỦ QUỸ</div>
-              <div class="flex items-baseline gap-1.5 mt-0.5">
-                <span id="kpiEnoughCount" class="text-xl font-extrabold text-emerald-700 tabular-nums">25 / 25</span>
-                <span class="text-xs text-slate-500 font-medium">thành viên</span>
+              <div class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase">ĐỦ QUỸ</div>
+              <div class="flex items-baseline justify-center sm:justify-start gap-1 mt-0.5">
+                <span id="kpiEnoughCount" class="text-xs sm:text-xl font-extrabold text-emerald-700 tabular-nums">25/25</span>
+                <span class="hidden sm:inline text-xs text-slate-500 font-medium">TV</span>
               </div>
             </div>
           </div>
-          <span id="kpiPaidRatio" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Đã nộp: 0 người</span>
+          <span id="kpiPaidRatio" class="hidden sm:inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Đã nộp: 0</span>
         </div>
 
         <!-- Ô 2: Chưa đóng / Đang thiếu tiền -->
-        <div onclick="document.getElementById('filter-debt-only').checked = !document.getElementById('filter-debt-only').checked; toggleDebtOnlyFilter(document.getElementById('filter-debt-only').checked);" class="bg-white rounded-xl px-4 py-3 border border-slate-200/90 shadow-2xs flex items-center justify-between cursor-pointer hover:border-rose-300 transition" title="Nhấp để lọc nhanh người chưa đóng">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-[22px]">notification_important</span>
+        <div onclick="document.getElementById('filter-debt-only').checked = !document.getElementById('filter-debt-only').checked; toggleDebtOnlyFilter(document.getElementById('filter-debt-only').checked);" class="bg-white rounded-xl p-2.5 sm:px-4 sm:py-3 border border-rose-200 bg-rose-50/20 sm:bg-white shadow-2xs flex flex-col sm:flex-row items-center sm:justify-between cursor-pointer hover:border-rose-300 transition text-center sm:text-left" title="Nhấp để lọc nhanh người chưa đóng">
+          <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
+            <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[16px] sm:text-[22px]">priority_high</span>
             </div>
             <div>
-              <div class="text-[11px] font-bold text-slate-400 uppercase">CHƯA ĐÓNG / ĐANG THIẾU</div>
-              <div class="flex items-baseline gap-1.5 mt-0.5">
-                <span id="kpiDebtorsCount" class="text-xl font-extrabold text-rose-600 tabular-nums">0 người</span>
-                <span id="kpiTotalDebtAmount" class="text-xs font-bold text-rose-500 tabular-nums">(0đ)</span>
+              <div class="text-[9px] sm:text-[11px] font-bold text-rose-500 uppercase">THIẾU TIỀN</div>
+              <div class="flex items-baseline justify-center sm:justify-start gap-1 mt-0.5">
+                <span id="kpiDebtorsCount" class="text-xs sm:text-xl font-extrabold text-rose-600 tabular-nums">0 ng</span>
+                <span id="kpiTotalDebtAmount" class="hidden sm:inline text-xs font-bold text-rose-500 tabular-nums">(0đ)</span>
               </div>
             </div>
           </div>
-          <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">Lọc xem</span>
+          <span class="hidden sm:inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">Lọc xem</span>
         </div>
 
         <!-- Ô 3: Tổng quỹ CLB hiện còn -->
-        <div class="bg-white rounded-xl px-4 py-3 border border-slate-200/90 shadow-2xs flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
+        <div class="bg-white rounded-xl p-2.5 sm:px-4 sm:py-3 border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left">
+          <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
+            <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[16px] sm:text-[22px]">account_balance_wallet</span>
             </div>
             <div>
-              <div class="text-[11px] font-bold text-slate-400 uppercase">QUỸ CLB HIỆN CÒN</div>
-              <div class="flex items-baseline gap-1 mt-0.5">
-                <span id="kpiBalance" class="text-xl font-extrabold text-slate-900 tabular-nums">0</span>
-                <span class="text-xs font-bold text-emerald-700">đ</span>
+              <div class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase">QUỸ CÒN</div>
+              <div class="flex items-baseline justify-center sm:justify-start gap-0.5 mt-0.5">
+                <span id="kpiBalance" class="text-xs sm:text-xl font-extrabold text-slate-900 tabular-nums">0</span>
+                <span class="text-[10px] sm:text-xs font-bold text-emerald-700">đ</span>
               </div>
             </div>
           </div>
-          <div class="text-right text-[11px] text-slate-500 tabular-nums">
+          <div class="hidden sm:block text-right text-[11px] text-slate-500 tabular-nums">
             <div>Tổng thu: <strong id="kpiTotalPaid" class="text-amber-700">0</strong>đ</div>
-            <div>Đã chi sân/nước: <strong id="kpiTotalUsed" class="text-rose-600">0</strong>đ</div>
+            <div>Đã chi: <strong id="kpiTotalUsed" class="text-rose-600">0</strong>đ</div>
           </div>
         </div>
       </div>
 
       <!-- ==================== TAB 1: BẢNG THEO DÕI ĐÓNG TIỀN & ĐIỂM DANH ==================== -->
       <div id="tabMatrix" class="space-y-5">
-        <!-- Toolbar -->
-        <div class="bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1">
-            <!-- Quick Search -->
-            <div class="relative flex-1 min-w-[220px]">
-              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
-              <input oninput="filterMatrixBySearch(this.value)" class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-xs sm:text-sm" id="player-search-input" placeholder="Tìm tên thành viên, số áo, biệt danh..." type="text"/>
+        <!-- Toolbar (Tối ưu cho Mobile & Desktop) -->
+        <div class="bg-white rounded-2xl p-3 sm:p-3.5 border border-slate-200/90 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1">
+            <!-- View Mode Switcher: Thẻ Mobile vs Bảng tính Google Sheets -->
+            <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200 self-start sm:self-auto">
+              <button type="button" id="btnViewCards" onclick="setMatrixViewMode('cards')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-emerald-700 shadow-xs transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px]">view_agenda</span>
+                <span>Thẻ Mobile</span>
+              </button>
+              <button type="button" id="btnViewTable" onclick="setMatrixViewMode('table')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px]">table_chart</span>
+                <span>Bảng tính</span>
+              </button>
             </div>
 
-            <!-- Filter Scope Pills -->
-            <div class="flex items-center gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200 overflow-x-auto">
+            <!-- Quick Search -->
+            <div class="relative flex-1 min-w-[180px]">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+              <input oninput="filterMatrixBySearch(this.value)" class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-xs sm:text-sm" id="player-search-input" placeholder="Tìm thành viên, số áo..." type="text"/>
+            </div>
+
+            <!-- Filter Scope Pills (Ẩn bớt trên mobile cho gọn) -->
+            <div class="hidden sm:flex items-center gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200 overflow-x-auto">
               <button onclick="setMatrixFilter('all')" id="btnFilterAll" class="match-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-emerald-700 shadow-xs transition-all whitespace-nowrap" type="button">Tất cả trận</button>
-              <button onclick="setMatrixFilter('recent5')" id="btnFilterRecent5" class="match-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all whitespace-nowrap" type="button">5 trận gần nhất</button>
-              <button onclick="setMatrixFilter('recent3')" id="btnFilterRecent3" class="match-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all whitespace-nowrap" type="button">3 trận gần nhất</button>
+              <button onclick="setMatrixFilter('recent5')" id="btnFilterRecent5" class="match-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all whitespace-nowrap" type="button">5 trận</button>
               <button onclick="openToggleMatchesModal()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all whitespace-nowrap flex items-center gap-1" type="button">
-                <span class="material-symbols-outlined text-[15px]">visibility_off</span> Ẩn/Hiện cột
+                <span class="material-symbols-outlined text-[15px]">visibility_off</span> Ẩn/Hiện
               </button>
             </div>
 
             <!-- Debt Only Switch Toggle -->
-            <label class="flex items-center gap-2 cursor-pointer select-none px-2 py-1 rounded-lg hover:bg-slate-50">
+            <label class="flex items-center gap-2 cursor-pointer select-none px-2 py-1 rounded-lg hover:bg-slate-50 self-start sm:self-auto">
               <input onchange="toggleDebtOnlyFilter(this.checked)" class="sr-only peer" id="filter-debt-only" type="checkbox"/>
-              <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500 relative shadow-inner"></div>
-              <span class="text-xs font-medium text-slate-600 peer-checked:text-rose-600 peer-checked:font-bold whitespace-nowrap">Chưa đóng / Âm quỹ</span>
+              <div class="w-8 h-4.5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-rose-500 relative shadow-inner"></div>
+              <span class="text-xs font-semibold text-slate-600 peer-checked:text-rose-600 whitespace-nowrap">Chưa nộp</span>
             </label>
           </div>
 
           <!-- Action Buttons Cluster -->
-          <div class="flex items-center gap-2 flex-wrap">
-            <button onclick="goToDepositPage('')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs shadow-sm transition-all" type="button">
+          <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <button onclick="goToDepositPage('')" class="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs transition-all" type="button">
               <span class="material-symbols-outlined text-[16px]">payments</span>
-              <span>Chọn mức đóng quỹ</span>
+              <span>Đóng quỹ</span>
             </button>
-            <button onclick="openAddMatchModal()" class="admin-only-el hidden inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-sm transition-all" type="button">
+            <button onclick="openAddMatchModal()" class="admin-only-el hidden inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs transition-all" type="button">
               <span class="material-symbols-outlined text-[16px]">add_circle</span>
-              <span>+ Trận mới</span>
+              <span>+ Trận</span>
             </button>
-            <button onclick="openAddPlayerModal()" class="admin-only-el hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button">
+            <button onclick="openAddPlayerModal()" class="admin-only-el hidden inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button">
               <span class="material-symbols-outlined text-emerald-600 text-[16px]">person_add</span>
-              <span>+ Thành viên</span>
+              <span>+ TV</span>
             </button>
-            <button onclick="exportMatrixToExcel()" class="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button">
+            <button onclick="exportMatrixToExcel()" class="hidden sm:inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button">
               <span class="material-symbols-outlined text-[16px]">file_download</span>
-              <span>Xuất Excel</span>
+              <span>Excel</span>
             </button>
           </div>
         </div>
 
         <!-- Hidden Matches Warning Banner -->
-        <div id="hiddenMatchesBanner" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 flex items-center justify-between">
+        <div id="hiddenMatchesBanner" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-800 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-[18px] text-amber-600">info</span>
-            <span>Đang ẩn <strong id="bannerHiddenCount" class="font-bold">0</strong> cột trận đấu cũ. Số tiền đóng và chi của các thành viên vẫn được tính đủ 100%.</span>
+            <span>Đang ẩn <strong id="bannerHiddenCount" class="font-bold">0</strong> cột trận cũ.</span>
           </div>
           <button onclick="setMatrixFilter('all')" class="text-emerald-700 font-bold underline hover:text-emerald-800 ml-3 flex-shrink-0">
-            Hiện lại tất cả
+            Hiện tất cả
           </button>
         </div>
 
-        <!-- Matrix Table Card -->
-        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col">
+        <!-- ==================== MOBILE CARD VIEW (MẶC ĐỊNH CHO ĐIỆN THOẠI) ==================== -->
+        <div id="matrixCardsContainer" class="space-y-3">
+          <!-- Thanh chọn trận đang điểm danh trên mobile -->
+          <div class="bg-white rounded-2xl p-3 border border-slate-200/90 shadow-2xs flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+              <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[18px]">sports_soccer</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="text-[9px] font-bold text-slate-400 uppercase leading-none">TRẬN ĐANG ĐIỂM DANH:</div>
+                <select id="mobileActiveMatchSelect" onchange="changeMobileActiveMatch(this.value)" class="text-xs sm:text-sm font-bold text-slate-900 bg-transparent border-none focus:outline-none cursor-pointer mt-0.5 truncate w-full p-0">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+            </div>
+            <div id="mobileActiveMatchStats" class="flex-shrink-0 text-[11px] sm:text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200 text-right">
+              0 Có mặt
+            </div>
+          </div>
+
+          <!-- Danh sách thẻ thành viên trên điện thoại -->
+          <div id="mobileCardsList" class="space-y-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Matrix Table Card (Bảng Excel dành cho màn hình lớn hoặc ai muốn vuốt xem bảng ngang) -->
+        <div id="matrixTableCard" class="hidden bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col">
           <div class="p-4 bg-slate-50/80 border-b border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div class="flex items-center gap-2.5">
               <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
@@ -1080,6 +1113,31 @@
     </div>
   </footer>
 
+  <!-- ==================== FIXED MOBILE BOTTOM DOCK (THANH ĐIỀU HƯỚNG DƯỚI ĐÁY CHO ĐIỆN THOẠI) ==================== -->
+  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1 flex items-center justify-around shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+    <button onclick="switchTab('matrix')" id="mobDockMatrix" class="flex flex-col items-center py-1 px-2.5 rounded-xl text-emerald-600 font-extrabold transition active:scale-95" type="button">
+      <span class="material-symbols-outlined text-[22px]">grid_view</span>
+      <span class="text-[10px] mt-0.5 font-bold">Sổ Quỹ</span>
+    </button>
+    <button onclick="switchTab('deposits')" id="mobDockDeposits" class="flex flex-col items-center py-1 px-2.5 rounded-xl text-slate-400 font-medium hover:text-slate-600 transition active:scale-95 relative" type="button">
+      <span class="material-symbols-outlined text-[22px]">payments</span>
+      <span class="text-[10px] mt-0.5">Nộp Quỹ</span>
+      <span id="mobPendingBadge" class="hidden absolute top-0.5 right-2 w-2 h-2 rounded-full bg-rose-600"></span>
+    </button>
+    <button onclick="switchTab('match')" id="mobDockMatch" class="flex flex-col items-center py-1 px-2.5 rounded-xl text-slate-400 font-medium hover:text-slate-600 transition active:scale-95" type="button">
+      <span class="material-symbols-outlined text-[22px]">checklist</span>
+      <span class="text-[10px] mt-0.5">Điểm Danh</span>
+    </button>
+    <button onclick="switchTab('members')" id="mobDockMembers" class="flex flex-col items-center py-1 px-2.5 rounded-xl text-slate-400 font-medium hover:text-slate-600 transition active:scale-95" type="button">
+      <span class="material-symbols-outlined text-[22px]">group</span>
+      <span class="text-[10px] mt-0.5">Thành Viên</span>
+    </button>
+    <button onclick="openLoginModal()" id="mobDockAuth" class="flex flex-col items-center py-1 px-2.5 rounded-xl text-slate-400 font-medium hover:text-slate-600 transition active:scale-95" type="button">
+      <span class="material-symbols-outlined text-[22px]">admin_panel_settings</span>
+      <span class="text-[10px] mt-0.5">Tài Khoản</span>
+    </button>
+  </nav>
+
   <!-- ==================== CLIENT INTERACTIVE JAVASCRIPT ==================== -->
   <script>
     let players = [];
@@ -1091,6 +1149,8 @@
     let matrixFilterMode = 'all';
     let searchQuery = '';
     let filterDebtOnly = false;
+    let matrixViewMode = localStorage.getItem('fc6h_view_mode') || (window.innerWidth < 768 ? 'cards' : 'table');
+    let mobileActiveMatchId = null;
 
     // Auth state: 'user' or 'admin'
     let currentAuthRole = localStorage.getItem('fc6h_role') || 'user';
@@ -1750,6 +1810,171 @@
         </tr>
       `;
       tableFoot.innerHTML = footHtml;
+
+      // Render cả chế độ Thẻ Điện Thoại & áp dụng View Mode
+      renderMobileCards(displayPlayers, visibleMatches);
+      setMatrixViewMode(matrixViewMode);
+    }
+
+    function setMatrixViewMode(mode) {
+      matrixViewMode = mode;
+      localStorage.setItem('fc6h_view_mode', mode);
+      const cCards = document.getElementById('matrixCardsContainer');
+      const cTable = document.getElementById('matrixTableCard');
+      const bCards = document.getElementById('btnViewCards');
+      const bTable = document.getElementById('btnViewTable');
+
+      if (mode === 'cards') {
+        if (cCards) cCards.classList.remove('hidden');
+        if (cTable) cTable.classList.add('hidden');
+        if (bCards) bCards.className = "px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-emerald-700 shadow-xs transition flex items-center gap-1";
+        if (bTable) bTable.className = "px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1";
+      } else {
+        if (cCards) cCards.classList.add('hidden');
+        if (cTable) cTable.classList.remove('hidden');
+        if (bTable) bTable.className = "px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-emerald-700 shadow-xs transition flex items-center gap-1";
+        if (bCards) bCards.className = "px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center gap-1";
+      }
+    }
+
+    function changeMobileActiveMatch(matchId) {
+      mobileActiveMatchId = matchId;
+      renderMatrixSheet();
+    }
+
+    function renderMobileCards(displayPlayers, visibleMatches) {
+      const container = document.getElementById('mobileCardsList');
+      const matchSelect = document.getElementById('mobileActiveMatchSelect');
+      const matchStats = document.getElementById('mobileActiveMatchStats');
+      if (!container || !matchSelect) return;
+
+      if (visibleMatches.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-slate-400 bg-white rounded-2xl border border-slate-200">Không có trận đấu nào hiển thị</div>`;
+        return;
+      }
+
+      if (!mobileActiveMatchId || !visibleMatches.some(m => m.id === mobileActiveMatchId)) {
+        mobileActiveMatchId = visibleMatches[visibleMatches.length - 1].id;
+      }
+
+      // Nạp danh sách các trận vào dropdown trên mobile
+      matchSelect.innerHTML = '';
+      visibleMatches.forEach(m => {
+        const d = new Date(m.matchDate);
+        const dayStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = `${m.title || 'Trận CN ' + dayStr} (${fmtMoney(m.pitchFee)})`;
+        if (m.id === mobileActiveMatchId) opt.selected = true;
+        matchSelect.appendChild(opt);
+      });
+
+      const currMatch = visibleMatches.find(m => m.id === mobileActiveMatchId) || visibleMatches[visibleMatches.length - 1];
+
+      // Đếm số người có mặt ở trận đang chọn
+      let countPresent = 0;
+      players.forEach(p => {
+        const rec = (p.matchRecords && p.matchRecords[currMatch.id]) || {};
+        if (rec.feeCharged > 0 || rec.isPresent) countPresent++;
+      });
+      const pitchShare = countPresent > 0 && currMatch ? Math.round(((currMatch.pitchFee || 0) / countPresent) / 1000) * 1000 : 0;
+
+      if (matchStats) {
+        matchStats.innerHTML = `${countPresent} Có mặt <span class="text-slate-500 font-semibold font-mono">(${fmtMoney(pitchShare)}/ng)</span>`;
+      }
+
+      container.innerHTML = '';
+      displayPlayers.forEach((p) => {
+        const isDebt = (p.balance || 0) < 0;
+        const hasPaid = (p.totalPaid || 0) > 0;
+        const numVal = p.displayOrder || (p._origIdx + 1);
+        const numStr = String(numVal).padStart(2, '0');
+        const initialLetter = p.name ? p.name.trim().charAt(0).toUpperCase() : '?';
+        const palette = isDebt
+          ? { bg: 'bg-rose-100', text: 'text-rose-800', border: 'border-rose-200', badge: 'text-rose-700' }
+          : AVATAR_PALETTES[p._origIdx % AVATAR_PALETTES.length];
+
+        const rec = (p.matchRecords && p.matchRecords[currMatch.id]) || { isPresent: false, feeCharged: 0, addedDeposit: 0 };
+        const isPresent = (rec.feeCharged > 0) || Boolean(rec.isPresent);
+        const suggestedAmt = isDebt ? Math.abs(p.balance) : 0;
+
+        let balBadge = '';
+        if (isDebt) {
+          balBadge = `
+            <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300 font-extrabold text-[11px] tabular-nums">
+              <span class="material-symbols-outlined text-[12px] text-rose-600">priority_high</span> ${fmtMoney(p.balance)}
+            </span>
+          `;
+        } else if ((p.balance || 0) > 0) {
+          balBadge = `
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-[11px] tabular-nums">
+              +${fmtMoney(p.balance)}
+            </span>
+          `;
+        } else {
+          balBadge = `
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-bold text-[11px] tabular-nums">
+              0đ
+            </span>
+          `;
+        }
+
+        const card = document.createElement('div');
+        card.className = `bg-white rounded-2xl p-3 border ${isDebt ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200/90'} shadow-2xs space-y-2.5 transition-all`;
+
+        card.innerHTML = `
+          <!-- Hàng 1: Avatar, Tên, Số dư quỹ to rõ ràng -->
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="relative w-9 h-9 rounded-full ${palette.bg} ${palette.text} font-bold flex items-center justify-center text-xs border ${palette.border} flex-shrink-0">
+                ${initialLetter}
+                <span class="absolute -bottom-1 -right-1 px-1 rounded bg-white ${palette.badge} text-[8px] font-extrabold border border-slate-200">#${numStr}</span>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span onclick="openPlayerHistoryModal('${p.id}')" class="font-bold text-slate-900 text-sm truncate cursor-pointer hover:text-emerald-700">${p.name}</span>
+                  ${p.nickname ? `<span class="text-[11px] text-slate-500 truncate">(${p.nickname})</span>` : ''}
+                </div>
+                <div class="text-[10px] text-slate-400">Đã nộp: <strong class="text-amber-700 font-mono">${fmtMoney(p.totalPaid)}</strong></div>
+              </div>
+            </div>
+            <div class="flex-shrink-0">
+              ${balBadge}
+            </div>
+          </div>
+
+          <!-- Hàng 2: Nút Điểm danh 1-Chạm cho trận này + Nút Nạp quỹ & Lịch sử -->
+          <div class="flex items-center justify-between pt-2 border-t border-slate-100 gap-1.5">
+            <!-- Điểm danh 1 chạm -->
+            ${isPresent ? `
+              <button onclick="quickToggleMatrixCell('${currMatch.id}', '${p.id}')" class="flex-1 py-1.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition" type="button">
+                <span class="material-symbols-outlined text-[15px] text-emerald-600">sports_soccer</span>
+                <span>Có mặt</span>
+                <span class="text-[10px] text-emerald-700 font-extrabold">(-${fmtMoney(rec.feeCharged || pitchShare)})</span>
+              </button>
+            ` : `
+              <button onclick="quickToggleMatrixCell('${currMatch.id}', '${p.id}')" class="flex-1 py-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 transition" type="button">
+                <span class="material-symbols-outlined text-[15px] text-slate-400">block</span>
+                <span>Vắng mặt</span>
+              </button>
+            `}
+
+            <!-- 2 nút thao tác nhanh -->
+            <button onclick="goToDepositPage('${p.id}', ${suggestedAmt})" class="px-2.5 py-1.5 rounded-xl ${isDebt ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'bg-amber-500 hover:bg-amber-600 text-white'} text-xs font-bold flex items-center gap-1 shadow-2xs active:scale-95 transition" title="Đóng quỹ cho ${p.name}">
+              <span class="material-symbols-outlined text-[15px]">payments</span> Nộp
+            </button>
+            <button onclick="openPlayerHistoryModal('${p.id}')" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 flex items-center gap-0.5 active:scale-95 transition" title="Xem lịch sử">
+              <span class="material-symbols-outlined text-[15px]">history</span>
+            </button>
+            ${isAdmin() ? `
+              <button onclick="openEditPlayerModal('${p.id}')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center border border-slate-200 active:scale-95 transition" title="Sửa">
+                <span class="material-symbols-outlined text-[14px]">edit</span>
+              </button>
+            ` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
     }
 
     // ==================== 4. TRANG CHỌN MỨC GIÁ ĐÓNG QUỸ & LỊCH SỬ TỪNG NGƯỜI ====================
@@ -2813,6 +3038,19 @@
         }
       });
 
+      // Đồng bộ trạng thái thanh điều hướng dưới đáy trên điện thoại (Mobile Dock)
+      const mobTabs = ['matrix', 'deposits', 'match', 'members'];
+      mobTabs.forEach(t => {
+        const mobBtn = document.getElementById('mobDock' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (mobBtn) {
+          if (t === tab) {
+            mobBtn.className = "flex flex-col items-center py-1 px-2.5 rounded-xl text-emerald-600 font-extrabold transition active:scale-95";
+          } else {
+            mobBtn.className = "flex flex-col items-center py-1 px-2.5 rounded-xl text-slate-400 font-medium hover:text-slate-600 transition active:scale-95";
+          }
+        }
+      });
+
       const activeSec = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
       const activeBtn = document.getElementById('tabBtn' + tab.charAt(0).toUpperCase() + tab.slice(1));
       if (activeSec) activeSec.classList.remove('hidden');
@@ -2824,6 +3062,9 @@
       if (tab === 'schedule') renderScheduleTab();
       if (tab === 'match') renderAttendanceRows();
       if (tab === 'members') renderMembersTab();
+      if (tab === 'matrix') renderMatrixSheet();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ==================== MODALS: VISIBILITY, MATCH, PLAYER, ZALO ====================
