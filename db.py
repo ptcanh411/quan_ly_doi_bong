@@ -8,6 +8,7 @@ DB_FILE = os.path.join(os.path.dirname(__file__), "fc_club.db")
 def get_connection():
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
 def init_db():
@@ -80,6 +81,30 @@ def init_db():
         note TEXT,
         createdAt TEXT,
         FOREIGN KEY(playerId) REFERENCES players(id) ON DELETE CASCADE
+    )
+    """)
+
+    # Pending deposit requests submitted by players (Multi-device approval queue)
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS deposit_requests (
+        id TEXT PRIMARY KEY,
+        playerId TEXT NOT NULL,
+        amount REAL NOT NULL,
+        depositDate TEXT NOT NULL,
+        note TEXT,
+        status TEXT DEFAULT 'PENDING',
+        createdAt TEXT,
+        reviewedAt TEXT,
+        FOREIGN KEY(playerId) REFERENCES players(id) ON DELETE CASCADE
+    )
+    """)
+
+    # Admin active session tokens
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS admin_tokens (
+        token TEXT PRIMARY KEY,
+        createdAt TEXT,
+        expiresAt TEXT
     )
     """)
 

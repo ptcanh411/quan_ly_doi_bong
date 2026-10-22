@@ -6,12 +6,45 @@ import os
 import uuid
 import sys
 import io
+import secrets
 from datetime import datetime, timedelta
 import sqlite3
 from db import get_connection, init_db, seed_db
 
 PORT = int(os.environ.get("PORT", 8000))
 PUBLIC_DIR = os.path.join(os.path.dirname(__file__), "public")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "ptcanh411")
+
+def is_admin_request(handler):
+    token = handler.get_header("X-Admin-Token")
+    if not token:
+        auth_header = handler.get_header("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:].strip()
+    if not token:
+        return False
+    
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        now_iso = datetime.now().isoformat()
+        cur.execute("SELECT token FROM admin_tokens WHERE token = ? AND (expiresAt IS NULL OR expiresAt > ?)", (token, now_iso))
+        row = cur.fetchone()
+        return bool(row)
+    except Exception:
+        return False
+    finally:
+        conn.close()
+
+def require_admin(handler):
+    if not is_admin_request(handler):
+        handler.send_json({"error": "Yêu cầu quyền Admin (Thủ quỹ). Vui lòng đăng nhập lại."}, 401)
+        return False
+    return True
+
+class ThreadingHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
+    daemon_threads = True
+    allow_reuse_address = True
 
 class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -25,7 +58,7 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
     def send_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Admin-Token, Authorization")
 
     def send_json(self, data, status=200):
         self.send_response(status)
@@ -33,6 +66,11 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_cors_headers()
         self.end_headers()
         self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+
+    def get_header(self, name, default=None):
+        if hasattr(self, "headers") and self.headers:
+            return self.headers.get(name, default)
+        return default
 
     def read_body(self):
         content_length = int(self.headers.get("Content-Length", 0))
@@ -88,11 +126,9 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
 
         try:
             if path == "/api/players":
-                # Get all active players
                 cur.execute("SELECT * FROM players WHERE isActive = 1 ORDER BY displayOrder ASC")
                 players = [dict(row) for row in cur.fetchall()]
 
-                # Get all match records for these players
                 cur.execute("SELECT * FROM match_player_records")
                 records = [dict(row) for row in cur.fetchall()]
 
@@ -103,7 +139,6 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                         records_by_player[pid] = {}
                     records_by_player[pid][r["matchId"]] = r
 
-                # Get direct deposits outside matches
                 cur.execute("SELECT playerId, SUM(amount) as totalDirect FROM deposit_transactions GROUP BY playerId")
                 direct_map = {row["playerId"]: (row["totalDirect"] or 0) for row in cur.fetchall()}
 
@@ -128,11 +163,19 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 """)
                 return self.send_json([dict(row) for row in cur.fetchall()])
 
+            elif path.startswith("/api/deposit-requests"):
+                cur.execute("""
+                SELECT r.*, p.name as playerName, p.nickname as playerNickname
+                FROM deposit_requests r
+                JOIN players p ON r.playerId = p.id
+                ORDER BY CASE WHEN r.status = 'PENDING' THEN 0 ELSE 1 END, r.createdAt DESC
+                """)
+                return self.send_json([dict(row) for row in cur.fetchall()])
+
             elif path == "/api/matches":
                 cur.execute("SELECT * FROM matches ORDER BY matchDate ASC")
                 matches = [dict(row) for row in cur.fetchall()]
 
-                # Enrich with attendee stats
                 cur.execute("""
                 SELECT matchId,
                        SUM(CASE WHEN isPresent = 1 THEN 1 ELSE 0 END) as attendingCount,
@@ -178,7 +221,6 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json(dict(cfg) if cfg else {})
 
             elif path == "/api/summary":
-                # Compute total paid, used, balance
                 cur.execute("SELECT SUM(initialDeposit) as totalInitial FROM players WHERE isActive = 1")
                 initial = cur.fetchone()["totalInitial"] or 0
 
@@ -203,6 +245,25 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                     "completedMatches": completed
                 })
 
+            elif path == "/api/auth/verify":
+                is_admin = is_admin_request(self)
+                return self.send_json({"valid": is_admin, "role": "admin" if is_admin else "user"})
+
+            elif path == "/api/backup":
+                if not require_admin(self):
+                    return
+                backup_data = {
+                    "version": 1,
+                    "exportedAt": datetime.now().isoformat(),
+                    "club_config": [dict(r) for r in cur.execute("SELECT * FROM club_config").fetchall()],
+                    "players": [dict(r) for r in cur.execute("SELECT * FROM players").fetchall()],
+                    "matches": [dict(r) for r in cur.execute("SELECT * FROM matches").fetchall()],
+                    "match_player_records": [dict(r) for r in cur.execute("SELECT * FROM match_player_records").fetchall()],
+                    "deposit_transactions": [dict(r) for r in cur.execute("SELECT * FROM deposit_transactions").fetchall()],
+                    "deposit_requests": [dict(r) for r in cur.execute("SELECT * FROM deposit_requests").fetchall()],
+                }
+                return self.send_json(backup_data)
+
             else:
                 return self.send_json({"error": "Not Found"}, 404)
         finally:
@@ -215,7 +276,86 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
         now = datetime.now().isoformat()
 
         try:
-            if path == "/api/players":
+            # 1. Admin Authentication Login
+            if path == "/api/auth/login":
+                pwd = (body.get("password") or "").strip()
+                if pwd == ADMIN_PASSWORD:
+                    token = "tok-" + secrets.token_hex(24)
+                    expires = (datetime.now() + timedelta(days=30)).isoformat()
+                    cur.execute("INSERT INTO admin_tokens (token, createdAt, expiresAt) VALUES (?, ?, ?)", (token, now, expires))
+                    conn.commit()
+                    return self.send_json({
+                        "success": True,
+                        "token": token,
+                        "role": "admin",
+                        "message": "Đăng nhập Admin thành công!"
+                    })
+                else:
+                    return self.send_json({"error": "Mật khẩu Admin không chính xác!"}, 401)
+
+            elif path == "/api/auth/logout":
+                token = self.get_header("X-Admin-Token") or body.get("token")
+                if token:
+                    cur.execute("DELETE FROM admin_tokens WHERE token = ?", (token,))
+                    conn.commit()
+                return self.send_json({"success": True, "message": "Đã đăng xuất"})
+
+            # 2. Player Deposit Requests (Public to all members)
+            elif path == "/api/deposit-requests":
+                player_id = body.get("playerId")
+                amount = float(body.get("amount", 0))
+                note = body.get("note", "").strip() or "Chuyển khoản nạp quỹ"
+                deposit_date = body.get("depositDate") or now[:10]
+
+                if not player_id or amount <= 0:
+                    return self.send_json({"error": "Vui lòng chọn thành viên và số tiền nạp hợp lệ"}, 400)
+
+                req_id = "req-" + str(uuid.uuid4())[:8]
+                cur.execute("""
+                INSERT INTO deposit_requests (id, playerId, amount, depositDate, note, status, createdAt)
+                VALUES (?, ?, ?, ?, ?, 'PENDING', ?)
+                """, (req_id, player_id, amount, deposit_date, note, now))
+                conn.commit()
+                return self.send_json({
+                    "success": True,
+                    "id": req_id,
+                    "message": "Đã gửi thông báo chuyển khoản! Chờ Thủ quỹ tick duyệt."
+                }, 201)
+
+            elif path.startswith("/api/deposit-requests/") and path.endswith("/approve"):
+                if not require_admin(self):
+                    return
+                req_id = path.split("/api/deposit-requests/")[1].split("/approve")[0]
+                cur.execute("SELECT * FROM deposit_requests WHERE id = ?", (req_id,))
+                req = cur.fetchone()
+                if not req:
+                    return self.send_json({"error": "Yêu cầu không tồn tại"}, 404)
+
+                if req["status"] != "PENDING":
+                    return self.send_json({"error": "Yêu cầu này đã được xử lý trước đó!"}, 400)
+
+                dep_id = "dep-" + str(uuid.uuid4())[:8]
+                cur.execute("""
+                INSERT INTO deposit_transactions (id, playerId, amount, depositDate, note, createdAt)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """, (dep_id, req["playerId"], req["amount"], req["depositDate"], req["note"], now))
+
+                cur.execute("UPDATE deposit_requests SET status = 'APPROVED', reviewedAt = ? WHERE id = ?", (now, req_id))
+                conn.commit()
+                return self.send_json({"success": True, "message": f"Đã duyệt nạp quỹ +{req['amount']:,.0f}đ thành công!"})
+
+            elif path.startswith("/api/deposit-requests/") and path.endswith("/reject"):
+                if not require_admin(self):
+                    return
+                req_id = path.split("/api/deposit-requests/")[1].split("/reject")[0]
+                cur.execute("UPDATE deposit_requests SET status = 'REJECTED', reviewedAt = ? WHERE id = ?", (now, req_id))
+                conn.commit()
+                return self.send_json({"success": True, "message": "Đã từ chối yêu cầu chuyển khoản"})
+
+            # 3. Protected Operations (Require Admin)
+            elif path == "/api/players":
+                if not require_admin(self):
+                    return
                 name = body.get("name", "").strip()
                 if not name:
                     return self.send_json({"error": "Tên thành viên là bắt buộc"}, 400)
@@ -233,7 +373,6 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)
                 """, (player_id, name, nickname, phone, initial_deposit, order, now, now))
 
-                # Also insert records for all matches
                 cur.execute("SELECT id FROM matches")
                 for m in cur.fetchall():
                     rec_id = f"rec-{m['id']}-{player_id}"
@@ -246,6 +385,8 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({"success": True, "id": player_id}, 201)
 
             elif path == "/api/deposits":
+                if not require_admin(self):
+                    return
                 player_id = body.get("playerId")
                 amount = float(body.get("amount", 0))
                 note = body.get("note", "").strip() or "Nộp tiền quỹ"
@@ -263,12 +404,13 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({"success": True, "id": dep_id}, 201)
 
             elif path == "/api/matches":
+                if not require_admin(self):
+                    return
                 auto_next = body.get("autoNextSunday", False)
                 title = body.get("title", "").strip()
                 match_date = body.get("matchDate")
 
                 if auto_next or not match_date:
-                    # Calculate next Sunday from latest match or today
                     cur.execute("SELECT matchDate FROM matches ORDER BY matchDate DESC LIMIT 1")
                     last_row = cur.fetchone()
                     base = datetime.now()
@@ -295,7 +437,6 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 time_slot = body.get("timeSlot", "06:00 - 07:30")
                 stadium = body.get("stadiumName", "Sân bóng 6h50")
 
-                # Validation Rule: Không cho 2 trận trùng nhau (trùng ngày, giờ)
                 match_date_prefix = match_date[:10]
                 cur.execute("""
                 SELECT id, title, matchDate, timeSlot FROM matches 
@@ -312,7 +453,6 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'SCHEDULED', 0, '', ?, ?)
                 """, (match_id, match_date, title, time_slot, stadium, pitch_fee, drinks_fee, default_drink, pitch_fee + drinks_fee, now, now))
 
-                # Add records for all active players
                 cur.execute("SELECT id FROM players WHERE isActive = 1")
                 for p in cur.fetchall():
                     rec_id = f"rec-{match_id}-{p['id']}"
@@ -325,6 +465,8 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({"success": True, "id": match_id}, 201)
 
             elif path == "/api/batch-save":
+                if not require_admin(self):
+                    return
                 updates = body.get("updates", [])
                 for u in updates:
                     mid = u.get("matchId")
@@ -355,8 +497,51 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({"success": True, "count": len(updates)})
 
             elif path == "/api/reseed":
+                if not require_admin(self):
+                    return
                 seed_db(conn)
                 return self.send_json({"success": True, "message": "Đã reset về dữ liệu gốc ban đầu thành công!"})
+
+            elif path == "/api/restore":
+                if not require_admin(self):
+                    return
+                data = body.get("data") or body
+                if not isinstance(data, dict) or "players" not in data or "matches" not in data:
+                    return self.send_json({"error": "Dữ liệu sao lưu không đúng định dạng!"}, 400)
+
+                cur.execute("DELETE FROM match_player_records")
+                cur.execute("DELETE FROM deposit_requests")
+                cur.execute("DELETE FROM deposit_transactions")
+                cur.execute("DELETE FROM matches")
+                cur.execute("DELETE FROM players")
+                cur.execute("DELETE FROM club_config")
+
+                for c in data.get("club_config", []):
+                    cur.execute("INSERT INTO club_config (id, clubName, bankCode, bankAccount, accountHolder, defaultTimeSlot) VALUES (?, ?, ?, ?, ?, ?)",
+                                (c.get("id", "default"), c.get("clubName"), c.get("bankCode"), c.get("bankAccount"), c.get("accountHolder"), c.get("defaultTimeSlot")))
+
+                for p in data.get("players", []):
+                    cur.execute("INSERT INTO players (id, name, nickname, phoneNumber, initialDeposit, isActive, displayOrder, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                (p["id"], p["name"], p.get("nickname"), p.get("phoneNumber"), p.get("initialDeposit", 0), p.get("isActive", 1), p.get("displayOrder", 0), p.get("createdAt"), p.get("updatedAt")))
+
+                for m in data.get("matches", []):
+                    cur.execute("INSERT INTO matches (id, matchDate, title, timeSlot, stadiumName, pitchFee, drinksFee, defaultDrinkPerPerson, totalCost, status, isHidden, notes, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                (m["id"], m["matchDate"], m.get("title"), m.get("timeSlot"), m.get("stadiumName"), m.get("pitchFee", 0), m.get("drinksFee", 0), m.get("defaultDrinkPerPerson", 10000), m.get("totalCost", 0), m.get("status", "SCHEDULED"), m.get("isHidden", 0), m.get("notes"), m.get("createdAt"), m.get("updatedAt")))
+
+                for r in data.get("match_player_records", []):
+                    cur.execute("INSERT INTO match_player_records (id, matchId, playerId, isPresent, hasDrinks, drinkAmount, pitchShare, feeCharged, addedDeposit, note, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                (r["id"], r["matchId"], r["playerId"], r.get("isPresent", 0), r.get("hasDrinks", 0), r.get("drinkAmount", 0), r.get("pitchShare", 0), r.get("feeCharged", 0), r.get("addedDeposit", 0), r.get("note"), r.get("createdAt"), r.get("updatedAt")))
+
+                for d in data.get("deposit_transactions", []):
+                    cur.execute("INSERT INTO deposit_transactions (id, playerId, amount, depositDate, note, createdAt) VALUES (?, ?, ?, ?, ?, ?)",
+                                (d["id"], d["playerId"], d["amount"], d["depositDate"], d.get("note"), d.get("createdAt")))
+
+                for dr in data.get("deposit_requests", []):
+                    cur.execute("INSERT INTO deposit_requests (id, playerId, amount, depositDate, note, status, createdAt, reviewedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                                (dr["id"], dr["playerId"], dr["amount"], dr["depositDate"], dr.get("note"), dr.get("status", "PENDING"), dr.get("createdAt"), dr.get("reviewedAt")))
+
+                conn.commit()
+                return self.send_json({"success": True, "message": "Đã khôi phục toàn bộ cơ sở dữ liệu thành công!"})
 
             else:
                 return self.send_json({"error": "Not Found"}, 404)
@@ -364,6 +549,8 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
             conn.close()
 
     def handle_api_put(self, path):
+        if not require_admin(self):
+            return
         body = self.read_body()
         conn = get_connection()
         cur = conn.cursor()
@@ -436,7 +623,6 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 WHERE id = ?
                 """, (title, match_date, time_slot, stadium, pitch_fee, drinks_fee, default_drink, pitch_fee + drinks_fee, status, is_hidden, notes, now, match_id))
 
-                # Update player records if provided
                 records = body.get("playerRecords", [])
                 for r in records:
                     pid = r.get("playerId")
@@ -488,6 +674,8 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
             conn.close()
 
     def handle_api_delete(self, path):
+        if not require_admin(self):
+            return
         conn = get_connection()
         cur = conn.cursor()
 
@@ -512,6 +700,12 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 conn.commit()
                 return self.send_json({"success": True, "message": "Đã xóa giao dịch nạp quỹ"})
 
+            elif path.startswith("/api/deposit-requests/"):
+                req_id = path.split("/api/deposit-requests/")[1]
+                cur.execute("DELETE FROM deposit_requests WHERE id = ?", (req_id,))
+                conn.commit()
+                return self.send_json({"success": True, "message": "Đã xóa yêu cầu nạp quỹ"})
+
             else:
                 return self.send_json({"error": "Not Found"}, 404)
         finally:
@@ -522,13 +716,10 @@ def run():
     os.makedirs(PUBLIC_DIR, exist_ok=True)
     server_address = ("0.0.0.0", PORT)
     
-    # Allow socket reuse so restart doesn't get Address already in use
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(server_address, FCRequestHandler) as httpd:
+    with ThreadingHTTPServer(server_address, FCRequestHandler) as httpd:
         print("==================================================")
-        print("FC 6H SANG CHU NHAT - WEB SERVER RUNNING AT:")
+        print("FC 6H SANG CHU NHAT - MULTI-THREADED SERVER READY")
         print(f"-> Desktop PC:   http://localhost:{PORT}")
-        print(f"-> Mobile Phone: http://172.18.60.233:{PORT}")
         print("==================================================")
         try:
             httpd.serve_forever()

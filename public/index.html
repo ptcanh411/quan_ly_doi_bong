@@ -302,6 +302,15 @@
               <span class="material-symbols-outlined text-[16px]">file_download</span>
               <span>Excel</span>
             </button>
+            <button onclick="downloadBackup()" class="admin-only-el hidden inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button" title="Tải bản sao lưu toàn bộ dữ liệu quỹ và trận đấu (JSON)">
+              <span class="material-symbols-outlined text-[16px] text-blue-600">cloud_download</span>
+              <span class="hidden sm:inline">Sao lưu</span>
+            </button>
+            <button onclick="triggerRestore()" class="admin-only-el hidden inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button" title="Khôi phục dữ liệu từ file sao lưu (JSON)">
+              <span class="material-symbols-outlined text-[16px] text-amber-600">cloud_upload</span>
+              <span class="hidden sm:inline">Khôi phục</span>
+            </button>
+            <input type="file" id="restoreFileInput" accept=".json" onchange="handleRestoreFile(event)" class="hidden" />
           </div>
         </div>
 
@@ -865,6 +874,17 @@
             Đăng xuất
           </button>
         </div>
+        <div id="adminBackupTools" class="hidden pt-3 border-t border-slate-200 space-y-2">
+          <label class="block font-bold text-slate-700">Sao lưu & Khôi phục dữ liệu CLB</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="downloadBackup()" class="py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold flex items-center justify-center gap-1 border border-blue-200 transition">
+              <span class="material-symbols-outlined text-[16px]">cloud_download</span> Tải sao lưu (JSON)
+            </button>
+            <button type="button" onclick="triggerRestore()" class="py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold flex items-center justify-center gap-1 border border-amber-200 transition">
+              <span class="material-symbols-outlined text-[16px]">cloud_upload</span> Phục hồi (JSON)
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   </div>
@@ -1131,8 +1151,35 @@
     let currentAuthRole = localStorage.getItem('fc6h_role') || 'user';
     let currentLoggedUserName = localStorage.getItem('fc6h_username') || 'Thành viên';
 
-    // Pending transfer requests submitted by users waiting for Admin tick approval
-    let pendingTransferRequests = JSON.parse(localStorage.getItem('fc6h_pending_deposits') || '[]');
+    // Pending transfer requests stored on server database
+    let depositRequests = [];
+
+    // Helper: Build headers with Admin Auth Token if available
+    function getAuthHeaders(headers = {}) {
+      const h = { 'Content-Type': 'application/json', ...headers };
+      const token = localStorage.getItem('fc6h_token');
+      if (token) {
+        h['X-Admin-Token'] = token;
+      }
+      return h;
+    }
+
+    // Helper: Authenticated fetch wrapper
+    async function authFetch(url, options = {}) {
+      options.headers = getAuthHeaders(options.headers || {});
+      const res = await fetch(url, options);
+      if (res.status === 401) {
+        const data = await res.clone().json().catch(() => ({}));
+        if (currentAuthRole === 'admin') {
+          currentAuthRole = 'user';
+          localStorage.removeItem('fc6h_token');
+          localStorage.setItem('fc6h_role', 'user');
+          applyAuthRoleUI();
+          showToast(data.error || 'Phiên làm việc Admin đã hết hạn! Vui lòng đăng nhập lại.', 'lock', true);
+        }
+      }
+      return res;
+    }
 
     // Pagination state
     let matrixPageSize = 'all';
@@ -1244,6 +1291,8 @@
         if (adminConfirmBox) adminConfirmBox.classList.remove('hidden');
         if (userNoticeBox) userNoticeBox.classList.add('hidden');
         if (btnLogout) btnLogout.classList.remove('hidden');
+        const adminBackupToolsEl = document.getElementById('adminBackupTools');
+        if (adminBackupToolsEl) adminBackupToolsEl.classList.remove('hidden');
 
         adminEls.forEach(el => {
           if (el.classList.contains('desktop-only')) {
@@ -1274,6 +1323,8 @@
         if (adminConfirmBox) adminConfirmBox.classList.add('hidden');
         if (userNoticeBox) userNoticeBox.classList.remove('hidden');
         if (btnLogout) btnLogout.classList.add('hidden');
+        const adminBackupToolsEl = document.getElementById('adminBackupTools');
+        if (adminBackupToolsEl) adminBackupToolsEl.classList.add('hidden');
 
         adminEls.forEach(el => el.classList.add('hidden'));
       }
@@ -1335,46 +1386,182 @@
       showToast(`Đã vào chế độ Người dùng: ${selectedName}`, 'person');
     }
 
-    function handleLoginAsAdmin(e) {
-      e.preventDefault();
-      const pwd = (document.getElementById('adminPasswordInput').value || '').trim();
-      if (pwd === 'ptcanh411') {
-        currentAuthRole = 'admin';
-        currentLoggedUserName = 'Admin (Thủ quỹ)';
-        localStorage.setItem('fc6h_role', 'admin');
-        localStorage.setItem('fc6h_username', 'Admin (Thủ quỹ)');
-        document.getElementById('adminPasswordInput').value = '';
-        closeLoginModal();
-        applyAuthRoleUI();
-        showToast('Đăng nhập Admin thành công! Đã mở khóa quyền tick chuyển khoản quỹ.', 'verified_user');
-      } else {
-        document.getElementById('loginErrorText').classList.remove('hidden');
+    async function verifyAdminToken() {
+      const token = localStorage.getItem('fc6h_token');
+      if (!token) {
+        if (currentAuthRole === 'admin') {
+          currentAuthRole = 'user';
+          localStorage.setItem('fc6h_role', 'user');
+        }
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/verify', {
+          headers: { 'X-Admin-Token': token }
+        });
+        const data = await res.json();
+        if (data.valid) {
+          currentAuthRole = 'admin';
+          currentLoggedUserName = 'Admin (Thủ quỹ)';
+          localStorage.setItem('fc6h_role', 'admin');
+        } else {
+          currentAuthRole = 'user';
+          localStorage.removeItem('fc6h_token');
+          localStorage.setItem('fc6h_role', 'user');
+        }
+      } catch (e) {
+        // network issue, keep current local role
       }
     }
 
-    function handleLogoutAdmin() {
+    async function handleLoginAsAdmin(e) {
+      e.preventDefault();
+      const pwd = (document.getElementById('adminPasswordInput').value || '').trim();
+      const btn = e.target.querySelector('button[type="submit"]');
+      const errEl = document.getElementById('loginErrorText');
+      if (btn) btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pwd })
+        });
+        const data = await res.json();
+        if (res.ok && data.success && data.token) {
+          currentAuthRole = 'admin';
+          currentLoggedUserName = 'Admin (Thủ quỹ)';
+          localStorage.setItem('fc6h_token', data.token);
+          localStorage.setItem('fc6h_role', 'admin');
+          localStorage.setItem('fc6h_username', 'Admin (Thủ quỹ)');
+          document.getElementById('adminPasswordInput').value = '';
+          errEl.classList.add('hidden');
+          closeLoginModal();
+          applyAuthRoleUI();
+          showToast('Đăng nhập Admin thành công! Đã mở khóa quyền duyệt và quản trị.', 'verified_user');
+          await initData();
+        } else {
+          errEl.textContent = data.error || 'Mật khẩu Admin không đúng!';
+          errEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ khi đăng nhập!', 'error', true);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function handleLogoutAdmin() {
+      const token = localStorage.getItem('fc6h_token');
+      if (token) {
+        fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Token': token },
+          body: JSON.stringify({ token })
+        }).catch(() => {});
+      }
       currentAuthRole = 'user';
       currentLoggedUserName = 'Thành viên';
+      localStorage.removeItem('fc6h_token');
       localStorage.setItem('fc6h_role', 'user');
       localStorage.setItem('fc6h_username', 'Thành viên');
       closeLoginModal();
       applyAuthRoleUI();
       showToast('Đã đăng xuất quyền Admin, chuyển về chế độ Thành viên.');
+      await initData();
+    }
+
+    // ==================== BACKUP & RESTORE DATA ====================
+    async function downloadBackup() {
+      if (!isAdmin()) {
+        showToast('Chỉ Admin mới có quyền tải bản sao lưu dữ liệu!', 'lock', true);
+        return;
+      }
+      try {
+        showToast('Đang tạo bản sao lưu...', 'cloud_download');
+        const res = await authFetch('/api/backup');
+        if (!res.ok) {
+          const err = await res.json();
+          showToast(err.error || 'Không thể tải bản sao lưu', 'error', true);
+          return;
+        }
+        const data = await res.json();
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const now = new Date();
+        const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '') + '_' + now.toTimeString().slice(0, 8).replace(/:/g, '');
+        a.href = url;
+        a.download = `fc6h_backup_${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Đã tải file sao lưu (.json) về máy an toàn!', 'cloud_done');
+      } catch (err) {
+        showToast('Lỗi khi tải file sao lưu!', 'error', true);
+      }
+    }
+
+    function triggerRestore() {
+      if (!isAdmin()) {
+        showToast('Chỉ Admin mới có quyền phục hồi dữ liệu!', 'lock', true);
+        return;
+      }
+      const fileInput = document.getElementById('restoreFileInput');
+      if (fileInput) fileInput.click();
+    }
+
+    async function handleRestoreFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      event.target.value = '';
+
+      if (!confirm(`CẢNH BÁO: Phục hồi từ file "${file.name}" sẽ ghi đè toàn bộ dữ liệu hiện tại bằng dữ liệu trong file sao lưu!\n\nBạn có chắc chắn muốn thực hiện?`)) {
+        return;
+      }
+
+      try {
+        showToast('Đang khôi phục dữ liệu từ file...', 'sync');
+        const text = await file.text();
+        const data = JSON.parse(text);
+        const res = await authFetch('/api/restore', {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+        const resData = await res.json();
+        if (res.ok && resData.success) {
+          showToast('Phục hồi dữ liệu thành công!', 'verified');
+          if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 70 });
+          await initData();
+        } else {
+          showToast(resData.error || 'Lỗi khi khôi phục dữ liệu!', 'error', true);
+        }
+      } catch (err) {
+        showToast('File sao lưu bị hỏng hoặc không đúng định dạng JSON!', 'error', true);
+      }
     }
 
     // ==================== 1. INITIAL DATA FETCH ====================
     async function initData() {
       try {
-        const [resPlayers, resMatches, resConfig, resDeposits] = await Promise.all([
-          fetch('/api/players').then(r => r.json()),
-          fetch('/api/matches').then(r => r.json()),
-          fetch('/api/config').then(r => r.json()),
-          fetch('/api/deposits').then(r => r.json()).catch(() => [])
+        await verifyAdminToken();
+
+        const [resPlayers, resMatches, resConfig, resDeposits, resRequests] = await Promise.all([
+          authFetch('/api/players').then(r => r.json()),
+          authFetch('/api/matches').then(r => r.json()),
+          authFetch('/api/config').then(r => r.json()),
+          authFetch('/api/deposits').then(r => r.json()).catch(() => []),
+          authFetch('/api/deposit-requests').then(r => r.json()).catch(() => [])
         ]);
 
-        players = resPlayers;
-        matches = resMatches;
+        players = resPlayers || [];
+        matches = resMatches || [];
         allDeposits = resDeposits || [];
+        if (resRequests) {
+          depositRequests = resRequests.filter(r => r.status === 'PENDING');
+        }
         if (resConfig && resConfig.bankAccount) clubConfig = resConfig;
 
         renderKPIs();
@@ -1566,9 +1753,8 @@
 
       // 6. Tự động lưu lên server
       try {
-        await fetch('/api/batch-save', {
+        await authFetch('/api/batch-save', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ updates })
         });
         const ind = document.getElementById('saveStatusIndicator');
@@ -2152,49 +2338,70 @@
       }
 
       try {
-        await fetch('/api/deposits', {
+        const res = await authFetch('/api/deposits', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ playerId, amount, note, depositDate })
         });
-
-        const player = players.find(p => p.id === playerId);
-        showToast(`Admin đã tick xác nhận: Cộng +${fmtMoney(amount)} cho ${player?.name}!`, "verified");
-        document.getElementById('tabDepositAmount').value = '';
-        updateLiveQrDisplay();
-        await initData();
+        const resData = await res.json();
+        if (res.ok && resData.success) {
+          const player = players.find(p => p.id === playerId);
+          showToast(`Admin đã tick xác nhận: Cộng +${fmtMoney(amount)} cho ${player?.name}!`, "verified");
+          document.getElementById('tabDepositAmount').value = '';
+          updateLiveQrDisplay();
+          await initData();
+        } else {
+          showToast(resData.error || "Lỗi khi ghi nhận đóng quỹ!", "error", true);
+        }
       } catch (err) {
         showToast("Lỗi khi ghi nhận đóng quỹ!", "error", true);
       }
     }
 
-    // Normal user submits a notification that they transferred -> waits for Admin to tick
-    function userSubmitPendingDeposit() {
+    async function fetchDepositRequests() {
+      try {
+        const res = await authFetch('/api/deposit-requests');
+        if (res.ok) {
+          const allReqs = await res.json();
+          depositRequests = (allReqs || []).filter(r => r.status === 'PENDING');
+          renderPendingApprovals();
+        }
+      } catch (e) {
+        console.error('Error fetching deposit requests:', e);
+      }
+    }
+
+    // Normal user submits a notification that they transferred -> stored in server database
+    async function userSubmitPendingDeposit() {
       const playerId = document.getElementById('tabDepositPlayerId').value;
       const amount = parseFloat(document.getElementById('tabDepositAmount').value) || 0;
-      const note = document.getElementById('tabDepositNote').value.trim() || 'CK VietQR (Chờ Admin duyệt)';
+      const note = document.getElementById('tabDepositNote').value.trim() || 'CK VietQR (Chờ Thủ quỹ duyệt)';
       const depositDate = document.getElementById('tabDepositDate').value || new Date().toISOString().split('T')[0];
 
       if (!playerId || amount <= 0) {
-        showToast("Vui lòng chọn mức giá đóng quỹ trước khi gửi báo!", "warning", true);
+        showToast("Vui lòng chọn mức tiền đóng quỹ trước khi gửi báo!", "warning", true);
         return;
       }
 
       const player = players.find(p => p.id === playerId);
-      const req = {
-        id: 'req-' + Date.now(),
-        playerId,
-        playerName: player ? player.name : 'Thành viên',
-        amount,
-        note,
-        depositDate
-      };
+      const pName = player ? player.name : 'Thành viên';
 
-      pendingTransferRequests.unshift(req);
-      localStorage.setItem('fc6h_pending_deposits', JSON.stringify(pendingTransferRequests));
-      document.getElementById('tabDepositAmount').value = '';
-      renderPendingApprovals();
-      showToast(`Đã gửi báo đóng ${fmtMoney(amount)} của ${req.playerName}! Chờ Admin tick xác nhận.`, 'schedule_send');
+      try {
+        showToast('Đang gửi thông báo lên hệ thống...', 'schedule_send');
+        const res = await authFetch('/api/deposit-requests', {
+          method: 'POST',
+          body: JSON.stringify({ playerId, amount, note, depositDate })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          document.getElementById('tabDepositAmount').value = '';
+          await fetchDepositRequests();
+          showToast(`Đã gửi báo đóng ${fmtMoney(amount)} của ${pName}! Chờ Thủ quỹ tick xác nhận.`, 'schedule_send');
+        } else {
+          showToast(data.error || 'Lỗi khi gửi thông báo chuyển khoản!', 'error', true);
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối máy chủ!', 'error', true);
+      }
     }
 
     function renderPendingApprovals() {
@@ -2204,38 +2411,38 @@
       const navBadge = document.getElementById('pendingDepositsBadge');
       if (!card || !list) return;
 
-      if (pendingTransferRequests.length === 0) {
+      if (!depositRequests || depositRequests.length === 0) {
         card.classList.add('hidden');
         if (navBadge) navBadge.classList.add('hidden');
         return;
       }
 
       card.classList.remove('hidden');
-      pill.textContent = pendingTransferRequests.length;
+      pill.textContent = depositRequests.length;
       if (navBadge) {
-        navBadge.textContent = pendingTransferRequests.length;
+        navBadge.textContent = depositRequests.length;
         navBadge.classList.remove('hidden');
       }
 
       list.innerHTML = '';
-      pendingTransferRequests.forEach(req => {
+      depositRequests.forEach(req => {
         const div = document.createElement('div');
         div.className = "p-3 rounded-xl bg-amber-50/70 border border-amber-200 flex items-center justify-between gap-2 text-xs";
         div.innerHTML = `
           <div>
             <div class="font-bold text-slate-900">${req.playerName} <span class="text-emerald-700 font-extrabold">+${fmtMoney(req.amount)}</span></div>
-            <div class="text-[11px] text-slate-500">${req.note} • ${req.depositDate}</div>
+            <div class="text-[11px] text-slate-500">${req.note || 'Chuyển khoản nạp quỹ'} • ${req.depositDate}</div>
           </div>
           <div class="flex items-center gap-1.5">
             ${isAdmin() ? `
-              <button onclick="adminApprovePendingDeposit('${req.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-2xs transition">
+              <button onclick="adminApprovePendingDeposit('${req.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
                 <span class="material-symbols-outlined text-[15px]">check_box</span> Tick Duyệt
               </button>
-              <button onclick="adminRejectPendingDeposit('${req.id}')" class="p-1.5 rounded-lg bg-slate-200 hover:bg-rose-100 text-slate-600 hover:text-rose-700 transition" title="Hủy yêu cầu">
+              <button onclick="adminRejectPendingDeposit('${req.id}')" class="p-1.5 rounded-lg bg-slate-200 hover:bg-rose-100 text-slate-600 hover:text-rose-700 transition active:scale-95" title="Từ chối yêu cầu">
                 <span class="material-symbols-outlined text-[15px]">close</span>
               </button>
             ` : `
-              <span class="px-2 py-1 rounded bg-amber-100 text-amber-800 font-semibold text-[11px]">Chờ Admin tick</span>
+              <span class="px-2 py-1 rounded bg-amber-100 text-amber-800 font-semibold text-[11px]">Chờ Thủ quỹ tick</span>
             `}
           </div>
         `;
@@ -2245,39 +2452,44 @@
 
     async function adminApprovePendingDeposit(reqId) {
       if (!isAdmin()) {
-        showToast('Chỉ Admin mới được tick xác nhận chuyển khoản!', 'lock', true);
+        showToast('Chỉ Admin (Thủ quỹ) mới được tick xác nhận chuyển khoản!', 'lock', true);
         return;
       }
-      const req = pendingTransferRequests.find(r => r.id === reqId);
-      if (!req) return;
 
       try {
-        await fetch('/api/deposits', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            playerId: req.playerId,
-            amount: req.amount,
-            note: req.note + ' (Admin đã duyệt)',
-            depositDate: req.depositDate
-          })
+        const res = await authFetch(`/api/deposit-requests/${reqId}/approve`, {
+          method: 'POST'
         });
-
-        pendingTransferRequests = pendingTransferRequests.filter(r => r.id !== reqId);
-        localStorage.setItem('fc6h_pending_deposits', JSON.stringify(pendingTransferRequests));
-        showToast(`Đã tick duyệt +${fmtMoney(req.amount)} vào quỹ của ${req.playerName}!`, 'verified');
-        await initData();
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(data.message || 'Đã tick duyệt chuyển khoản quỹ thành công!', 'verified');
+          if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 60 });
+          await initData();
+        } else {
+          showToast(data.error || 'Lỗi khi duyệt khoản đóng quỹ!', 'error', true);
+        }
       } catch (err) {
         showToast('Lỗi khi duyệt khoản đóng quỹ!', 'error', true);
       }
     }
 
-    function adminRejectPendingDeposit(reqId) {
+    async function adminRejectPendingDeposit(reqId) {
       if (!isAdmin()) return;
-      pendingTransferRequests = pendingTransferRequests.filter(r => r.id !== reqId);
-      localStorage.setItem('fc6h_pending_deposits', JSON.stringify(pendingTransferRequests));
-      renderPendingApprovals();
-      showToast('Đã xóa yêu cầu chờ duyệt.');
+      if (!confirm('Bạn có chắc muốn từ chối yêu cầu nạp quỹ này?')) return;
+      try {
+        const res = await authFetch(`/api/deposit-requests/${reqId}/reject`, {
+          method: 'POST'
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast('Đã xóa yêu cầu chờ duyệt.');
+          await fetchDepositRequests();
+        } else {
+          showToast(data.error || 'Lỗi khi từ chối yêu cầu!', 'error', true);
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối khi từ chối yêu cầu!', 'error', true);
+      }
     }
 
     // Render Per-Player Deposit Summary in Tab 2
@@ -2417,7 +2629,7 @@
       if (!confirm(`Xác nhận xóa giao dịch đóng ${fmtMoney(amount)} của "${playerName}"?`)) return;
 
       try {
-        await fetch(`/api/deposits/${depId}`, { method: 'DELETE' });
+        await authFetch(`/api/deposits/${depId}`, { method: 'DELETE' });
         showToast(`Đã xóa giao dịch nạp của ${playerName}!`);
         await initData();
       } catch (err) {
@@ -2587,9 +2799,8 @@
 
       try {
         if (updates.length > 0) {
-          await fetch('/api/batch-save', {
+          await authFetch('/api/batch-save', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ updates })
           });
           pendingUpdates = {};
@@ -2676,7 +2887,7 @@
 
     async function loadMatchDetails(matchId) {
       try {
-        const res = await fetch(`/api/matches/${matchId}`).then(r => r.json());
+        const res = await authFetch(`/api/matches/${matchId}`).then(r => r.json());
         currentMatchData = res;
 
         document.getElementById('inputPitchFee').value = res.pitchFee || 0;
@@ -2876,11 +3087,15 @@
       });
 
       try {
-        await fetch(`/api/matches/${selectedMatchId}`, {
+        const res = await authFetch(`/api/matches/${selectedMatchId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pitchFee, defaultDrinkPerPerson: defaultDrink, matchDate, playerRecords })
         });
+        const resData = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          showToast(resData.error || "Lỗi khi lưu trận đấu!", "error", true);
+          return;
+        }
 
         showToast("Đã lưu điểm danh & kết quả trận!", "verified");
         await initData();
@@ -3024,7 +3239,7 @@
       if (!isAdmin()) return;
       if (!confirm(`Xác nhận xóa trận "${matchTitle}"?`)) return;
       try {
-        await fetch(`/api/matches/${matchId}`, { method: 'DELETE' });
+        await authFetch(`/api/matches/${matchId}`, { method: 'DELETE' });
         showToast(`Đã xóa trận ${matchTitle}!`, "delete");
         await initData();
       } catch (err) {
@@ -3172,9 +3387,8 @@
       const defaultDrink = parseFloat(document.getElementById('newMatchDrinkFee').value) || 10000;
 
       try {
-        const res = await fetch('/api/matches', {
+        const res = await authFetch('/api/matches', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title, matchDate, timeSlot, stadiumName, pitchFee, defaultDrinkPerPerson: defaultDrink })
         });
         const data = await res.json();
@@ -3232,18 +3446,26 @@
 
       try {
         if (id) {
-          await fetch(`/api/players/${id}`, {
+          const res = await authFetch(`/api/players/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, nickname, phoneNumber })
           });
+          const resData = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            showToast(resData.error || "Lỗi khi cập nhật thành viên!", "error", true);
+            return;
+          }
           showToast(`Đã cập nhật ${name}!`);
         } else {
-          await fetch('/api/players', {
+          const res = await authFetch('/api/players', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, nickname, phoneNumber, initialDeposit })
           });
+          const resData = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            showToast(resData.error || "Lỗi khi thêm thành viên!", "error", true);
+            return;
+          }
           showToast(`Đã thêm thành viên ${name}!`, "person_add");
         }
         closePlayerModal();
@@ -3257,7 +3479,12 @@
       if (!isAdmin()) return;
       if (!confirm(`Xác nhận xóa thành viên "${playerName}"?`)) return;
       try {
-        await fetch(`/api/players/${playerId}`, { method: 'DELETE' });
+        const res = await authFetch(`/api/players/${playerId}`, { method: 'DELETE' });
+        const resData = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          showToast(resData.error || "Lỗi khi xóa thành viên!", "error", true);
+          return;
+        }
         showToast(`Đã xóa ${playerName}!`, "delete");
         await initData();
       } catch (err) {

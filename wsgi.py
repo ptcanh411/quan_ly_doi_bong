@@ -5,7 +5,7 @@ import mimetypes
 import urllib.parse
 from datetime import datetime
 
-# Ensure project root is in sys.path
+# Ensure project root is in sys.path (Crucial for PythonAnywhere WSGI configuration)
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 if PROJECT_DIR not in sys.path:
     sys.path.insert(0, PROJECT_DIR)
@@ -24,9 +24,15 @@ class WSGIResponseContext:
         self.response_headers = [
             ("Access-Control-Allow-Origin", "*"),
             ("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"),
-            ("Access-Control-Allow-Headers", "Content-Type"),
+            ("Access-Control-Allow-Headers", "Content-Type, X-Admin-Token, Authorization"),
         ]
         self.response_body = b""
+
+    def get_header(self, name, default=None):
+        key = name.upper().replace("-", "_")
+        if key in ("CONTENT_TYPE", "CONTENT_LENGTH"):
+            return self.environ.get(key, default)
+        return self.environ.get("HTTP_" + key, self.environ.get(key, default))
 
     def read_body(self):
         try:
@@ -62,7 +68,7 @@ def application(environ, start_response):
         headers = [
             ("Access-Control-Allow-Origin", "*"),
             ("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"),
-            ("Access-Control-Allow-Headers", "Content-Type"),
+            ("Access-Control-Allow-Headers", "Content-Type, X-Admin-Token, Authorization"),
             ("Content-Length", "0"),
         ]
         start_response("200 OK", headers)
@@ -91,6 +97,8 @@ def application(environ, start_response):
             200: "OK",
             201: "Created",
             400: "Bad Request",
+            401: "Unauthorized",
+            403: "Forbidden",
             404: "Not Found",
             405: "Method Not Allowed",
             500: "Internal Server Error"
