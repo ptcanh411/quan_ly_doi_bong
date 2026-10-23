@@ -79,6 +79,21 @@
     * { font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
     .display-font { font-family: 'Space Grotesk', sans-serif !important; }
     .tabular-nums, table, td, th, [data-amount] { font-variant-numeric: tabular-nums; }
+    /* Mobile-first touch improvements */
+    @media (max-width: 640px) {
+      input[type="text"], input[type="number"], input[type="date"], input[type="datetime-local"], select {
+        font-size: 16px !important; /* Chống iOS Safari tự động zoom khi focus vào input */
+      }
+      .mobile-btn-touch {
+        min-height: 40px;
+        min-width: 40px;
+      }
+      /* Tối ưu cuộn mượt và vùng bấm trên thiết bị cảm ứng */
+      button, a, input, select {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+    }
   </style>
 </head>
 
@@ -169,7 +184,7 @@
   </header>
 
   <!-- ==================== MAIN WORKSPACE ==================== -->
-  <main class="w-full pt-28 sm:pt-32 pb-16 bg-[#f8fafc] min-h-screen">
+  <main class="w-full pt-28 sm:pt-32 pb-24 sm:pb-20 bg-[#f8fafc] min-h-screen">
     <div class="relative w-full max-w-[1440px] mx-auto px-3 sm:px-gutter md:px-gutter-tablet lg:px-gutter-desktop flex flex-col gap-3 sm:gap-4">
 
       <!-- Role Banner Notification (Gọn gàng trên mobile) -->
@@ -188,17 +203,17 @@
       </div>
 
       <!-- ==================== 1. THANH THEO DÕI ĐÓNG QUỸ CLB (TỐI ƯU CỰC GỌN CHO MOBILE) ==================== -->
-      <div class="grid grid-cols-3 gap-2 sm:gap-3">
+      <div class="grid grid-cols-3 gap-1.5 sm:gap-3">
         <!-- Ô 1: Đã đóng / Đủ quỹ -->
-        <div onclick="toggleDebtOnlyFilter(false); document.getElementById('filter-debt-only').checked = false;" class="bg-white rounded-xl p-2.5 sm:px-4 sm:py-3 border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center sm:justify-between cursor-pointer hover:border-emerald-300 transition text-center sm:text-left">
-          <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
-            <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-[16px] sm:text-[22px]">how_to_reg</span>
+        <div onclick="toggleDebtOnlyFilter(false); document.getElementById('filter-debt-only').checked = false;" class="bg-white rounded-xl p-2 sm:px-4 sm:py-3 border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center sm:justify-between cursor-pointer hover:border-emerald-300 transition text-center sm:text-left">
+          <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 min-w-0 w-full">
+            <div class="w-6 h-6 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[15px] sm:text-[22px]">how_to_reg</span>
             </div>
-            <div>
-              <div class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase">ĐỦ QUỸ</div>
+            <div class="min-w-0 w-full">
+              <div class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase truncate">ĐỦ QUỸ</div>
               <div class="flex items-baseline justify-center sm:justify-start gap-1 mt-0.5">
-                <span id="kpiEnoughCount" class="text-xs sm:text-xl font-extrabold text-emerald-700 tabular-nums">25/25</span>
+                <span id="kpiEnoughCount" class="text-[11px] sm:text-xl font-extrabold text-emerald-700 tabular-nums">25/25</span>
                 <span class="hidden sm:inline text-xs text-slate-500 font-medium">TV</span>
               </div>
             </div>
@@ -207,15 +222,15 @@
         </div>
 
         <!-- Ô 2: Chưa đóng / Đang thiếu tiền -->
-        <div onclick="document.getElementById('filter-debt-only').checked = !document.getElementById('filter-debt-only').checked; toggleDebtOnlyFilter(document.getElementById('filter-debt-only').checked);" class="bg-white rounded-xl p-2.5 sm:px-4 sm:py-3 border border-rose-200 bg-rose-50/20 sm:bg-white shadow-2xs flex flex-col sm:flex-row items-center sm:justify-between cursor-pointer hover:border-rose-300 transition text-center sm:text-left" title="Nhấp để lọc nhanh người chưa đóng">
-          <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
-            <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-[16px] sm:text-[22px]">priority_high</span>
+        <div onclick="document.getElementById('filter-debt-only').checked = !document.getElementById('filter-debt-only').checked; toggleDebtOnlyFilter(document.getElementById('filter-debt-only').checked);" class="bg-white rounded-xl p-2 sm:px-4 sm:py-3 border border-rose-200 bg-rose-50/20 sm:bg-white shadow-2xs flex flex-col sm:flex-row items-center sm:justify-between cursor-pointer hover:border-rose-300 transition text-center sm:text-left" title="Nhấp để lọc nhanh người chưa đóng">
+          <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 min-w-0 w-full">
+            <div class="w-6 h-6 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[15px] sm:text-[22px]">priority_high</span>
             </div>
-            <div>
-              <div class="text-[9px] sm:text-[11px] font-bold text-rose-500 uppercase">THIẾU TIỀN</div>
+            <div class="min-w-0 w-full">
+              <div class="text-[9px] sm:text-[11px] font-bold text-rose-500 uppercase truncate">THIẾU TIỀN</div>
               <div class="flex items-baseline justify-center sm:justify-start gap-1 mt-0.5">
-                <span id="kpiDebtorsCount" class="text-xs sm:text-xl font-extrabold text-rose-600 tabular-nums">0 ng</span>
+                <span id="kpiDebtorsCount" class="text-[11px] sm:text-xl font-extrabold text-rose-600 tabular-nums">0 ng</span>
                 <span id="kpiTotalDebtAmount" class="hidden sm:inline text-xs font-bold text-rose-500 tabular-nums">(0đ)</span>
               </div>
             </div>
@@ -224,16 +239,16 @@
         </div>
 
         <!-- Ô 3: Tổng quỹ CLB hiện còn -->
-        <div class="bg-white rounded-xl p-2.5 sm:px-4 sm:py-3 border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left">
-          <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
-            <div class="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center flex-shrink-0">
-              <span class="material-symbols-outlined text-[16px] sm:text-[22px]">account_balance_wallet</span>
+        <div class="bg-white rounded-xl p-2 sm:px-4 sm:py-3 border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left">
+          <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 min-w-0 w-full">
+            <div class="w-6 h-6 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-[15px] sm:text-[22px]">account_balance_wallet</span>
             </div>
-            <div>
-              <div class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase">QUỸ CÒN</div>
+            <div class="min-w-0 w-full">
+              <div class="text-[9px] sm:text-[11px] font-bold text-slate-400 uppercase truncate">QUỸ CÒN</div>
               <div class="flex items-baseline justify-center sm:justify-start gap-0.5 mt-0.5">
-                <span id="kpiBalance" class="text-xs sm:text-xl font-extrabold text-slate-900 tabular-nums">0</span>
-                <span class="text-[10px] sm:text-xs font-bold text-emerald-700">đ</span>
+                <span id="kpiBalance" class="text-[11px] sm:text-xl font-extrabold text-slate-900 tabular-nums truncate">0</span>
+                <span class="text-[9px] sm:text-xs font-bold text-emerald-700">đ</span>
               </div>
             </div>
           </div>
@@ -286,27 +301,27 @@
 
           <!-- Action Buttons Cluster -->
           <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-            <button onclick="goToDepositPage('')" class="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs transition-all" type="button">
+            <button onclick="goToDepositPage('')" class="inline-flex items-center gap-1 min-h-[38px] px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs active:scale-95 transition-all" type="button">
               <span class="material-symbols-outlined text-[16px]">payments</span>
               <span>Đóng quỹ</span>
             </button>
-            <button onclick="openAddMatchModal()" class="admin-only-el hidden inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs transition-all" type="button">
+            <button onclick="openAddMatchModal()" class="admin-only-el hidden inline-flex items-center gap-1 min-h-[38px] px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs active:scale-95 transition-all" type="button">
               <span class="material-symbols-outlined text-[16px]">add_circle</span>
               <span>+ Trận</span>
             </button>
-            <button onclick="openAddPlayerModal()" class="admin-only-el hidden inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button">
+            <button onclick="openAddPlayerModal()" class="admin-only-el hidden inline-flex items-center gap-1 min-h-[38px] px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs border border-slate-200 active:scale-95 transition-all" type="button">
               <span class="material-symbols-outlined text-emerald-600 text-[16px]">person_add</span>
               <span>+ TV</span>
             </button>
-            <button onclick="exportMatrixToExcel()" class="hidden sm:inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button">
+            <button onclick="exportMatrixToExcel()" class="hidden sm:inline-flex items-center gap-1 min-h-[38px] px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 active:scale-95 transition-all" type="button">
               <span class="material-symbols-outlined text-[16px]">file_download</span>
               <span>Excel</span>
             </button>
-            <button onclick="downloadBackup()" class="admin-only-el hidden inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button" title="Tải bản sao lưu toàn bộ dữ liệu quỹ và trận đấu (JSON)">
+            <button onclick="downloadBackup()" class="admin-only-el hidden inline-flex items-center gap-1 min-h-[38px] px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 active:scale-95 transition-all" type="button" title="Tải bản sao lưu toàn bộ dữ liệu quỹ và trận đấu (JSON)">
               <span class="material-symbols-outlined text-[16px] text-blue-600">cloud_download</span>
               <span class="hidden sm:inline">Sao lưu</span>
             </button>
-            <button onclick="triggerRestore()" class="admin-only-el hidden inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-all" type="button" title="Khôi phục dữ liệu từ file sao lưu (JSON)">
+            <button onclick="triggerRestore()" class="admin-only-el hidden inline-flex items-center gap-1 min-h-[38px] px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 active:scale-95 transition-all" type="button" title="Khôi phục dữ liệu từ file sao lưu (JSON)">
               <span class="material-symbols-outlined text-[16px] text-amber-600">cloud_upload</span>
               <span class="hidden sm:inline">Khôi phục</span>
             </button>
@@ -436,22 +451,22 @@
               <div>
                 <label class="block font-bold text-slate-700 mb-2 text-sm">2. Chọn mức tiền muốn đóng vào quỹ *</label>
                 <div class="flex flex-wrap gap-2" id="priceTierGrid">
-                  <button type="button" onclick="selectDepositTier(20000)" data-tier="20000" class="tier-card px-3 py-1.5 rounded-lg border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
+                  <button type="button" onclick="selectDepositTier(20000)" data-tier="20000" class="tier-card min-h-[38px] px-3.5 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
                     20.000đ
                   </button>
-                  <button type="button" onclick="selectDepositTier(30000)" data-tier="30000" class="tier-card px-3 py-1.5 rounded-lg border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
+                  <button type="button" onclick="selectDepositTier(30000)" data-tier="30000" class="tier-card min-h-[38px] px-3.5 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
                     30.000đ
                   </button>
-                  <button type="button" onclick="selectDepositTier(50000)" data-tier="50000" class="tier-card px-3 py-1.5 rounded-lg border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
+                  <button type="button" onclick="selectDepositTier(50000)" data-tier="50000" class="tier-card min-h-[38px] px-3.5 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
                     50.000đ
                   </button>
-                  <button type="button" onclick="selectDepositTier(100000)" data-tier="100000" class="tier-card px-3 py-1.5 rounded-lg border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
+                  <button type="button" onclick="selectDepositTier(100000)" data-tier="100000" class="tier-card min-h-[38px] px-3.5 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
                     100.000đ
                   </button>
-                  <button type="button" onclick="selectDepositTier(200000)" data-tier="200000" class="tier-card px-3 py-1.5 rounded-lg border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
+                  <button type="button" onclick="selectDepositTier(200000)" data-tier="200000" class="tier-card min-h-[38px] px-3.5 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
                     200.000đ
                   </button>
-                  <button type="button" onclick="selectDepositTier(500000)" data-tier="500000" class="tier-card px-3 py-1.5 rounded-lg border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
+                  <button type="button" onclick="selectDepositTier(500000)" data-tier="500000" class="tier-card min-h-[38px] px-3.5 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50/60 text-slate-700 font-bold text-xs sm:text-sm tabular-nums transition active:scale-95">
                     500.000đ
                   </button>
                 </div>
@@ -485,7 +500,7 @@
                       [Quyền Admin] Tôi xác nhận thành viên này đã chuyển khoản / đóng tiền quỹ
                     </span>
                   </label>
-                  <button type="button" onclick="adminSubmitDeposit()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
+                  <button type="button" onclick="adminSubmitDeposit()" class="w-full min-h-[44px] py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 active:scale-95">
                     <span class="material-symbols-outlined text-[20px]">verified</span>
                     <span>Tick Đã Chuyển Khoản &amp; Cộng Vào Quỹ Ngay</span>
                   </button>
@@ -501,11 +516,11 @@
                     </div>
                   </div>
                   <div class="flex flex-wrap gap-2">
-                    <button type="button" onclick="userSubmitPendingDeposit()" class="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5">
+                    <button type="button" onclick="userSubmitPendingDeposit()" class="flex-1 min-h-[42px] py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 active:scale-95">
                       <span class="material-symbols-outlined text-[17px]">send</span>
                       <span>Gửi báo đã chuyển khoản (Chờ Admin tick duyệt)</span>
                     </button>
-                    <button type="button" onclick="openLoginModal()" class="px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs rounded-xl transition flex items-center gap-1">
+                    <button type="button" onclick="openLoginModal()" class="min-h-[42px] px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 active:scale-95">
                       <span class="material-symbols-outlined text-[17px]">admin_panel_settings</span>
                       <span>Tôi là Admin</span>
                     </button>
@@ -632,14 +647,14 @@
               </select>
             </div>
 
-            <div class="flex items-center gap-2.5 flex-wrap">
-              <button onclick="toggleSelectAllAttendance(true)" class="admin-only-el hidden px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 transition">
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="toggleSelectAllAttendance(true)" class="admin-only-el hidden min-h-[40px] px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 active:scale-95 transition">
                 Chọn tất cả đi đá
               </button>
-              <button onclick="autoSplitPitchFee()" class="admin-only-el hidden px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200 flex items-center gap-1.5 transition">
+              <button onclick="autoSplitPitchFee()" class="admin-only-el hidden min-h-[40px] px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200 flex items-center gap-1.5 active:scale-95 transition">
                 <span class="material-symbols-outlined text-[18px]">calculate</span> Chia đều tiền sân
               </button>
-              <button onclick="saveCurrentMatchDetails()" class="admin-only-el hidden px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition">
+              <button onclick="saveCurrentMatchDetails()" class="admin-only-el hidden min-h-[40px] px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 active:scale-95 transition">
                 <span class="material-symbols-outlined text-[18px]">done</span> Lưu kết quả trận
               </button>
             </div>
@@ -810,7 +825,7 @@
 
   <!-- ==================== MODAL: ĐĂNG NHẬP NGƯỜI DÙNG & ADMIN ==================== -->
   <div id="modalLogin" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
-    <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-5">
+    <div class="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-5 sm:p-6 shadow-2xl border border-slate-200 space-y-4 sm:space-y-5">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2">
           <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
@@ -926,18 +941,18 @@
         <!-- Populated by JS -->
       </div>
 
-      <div class="flex justify-between items-center pt-2 border-t border-slate-100">
-        <button id="historyModalDepositBtn" onclick="" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1">
+      <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 pt-2 border-t border-slate-100">
+        <button id="historyModalDepositBtn" onclick="" class="min-h-[40px] px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center justify-center gap-1 active:scale-95 transition">
           <span class="material-symbols-outlined text-[15px]">payments</span> Chọn mức đóng quỹ cho người này
         </button>
-        <button onclick="closePlayerHistoryModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs">Đóng</button>
+        <button onclick="closePlayerHistoryModal()" class="min-h-[40px] px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs active:scale-95 transition">Đóng</button>
       </div>
     </div>
   </div>
 
   <!-- ==================== MODAL: TÙY CHỌN ẨN/HIỆN CỘT TRẬN ĐẤU ==================== -->
   <div id="modalToggleMatches" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="rounded-2xl bg-white max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+    <div class="rounded-2xl bg-white max-w-md w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-200">
       <div class="flex justify-between items-center border-b border-slate-100 pb-3">
         <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
           <span class="material-symbols-outlined text-emerald-600 text-[20px]">visibility</span>
@@ -974,7 +989,7 @@
 
   <!-- ==================== MODAL: TẠO TRẬN MỚI ==================== -->
   <div id="modalMatch" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="rounded-2xl bg-white max-w-sm w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+    <div class="rounded-2xl bg-white max-w-sm w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-200">
       <div class="flex justify-between items-center border-b border-slate-100 pb-3">
         <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
           <span class="material-symbols-outlined text-emerald-600 text-[20px]">calendar_month</span>
@@ -1037,7 +1052,7 @@
 
   <!-- ==================== MODAL: THÊM / SỬA THÀNH VIÊN ==================== -->
   <div id="modalPlayer" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="rounded-2xl bg-white max-w-sm w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+    <div class="rounded-2xl bg-white max-w-sm w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-200">
       <div class="flex justify-between items-center border-b border-slate-100 pb-3">
         <h3 id="modalPlayerTitle" class="font-bold text-base text-slate-900 flex items-center gap-2">
           <span class="material-symbols-outlined text-emerald-600 text-[20px]">person_add</span>
@@ -1085,7 +1100,7 @@
 
   <!-- ==================== MODAL: BÁO CÁO ZALO ==================== -->
   <div id="modalZalo" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="rounded-2xl bg-white max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+    <div class="rounded-2xl bg-white max-w-md w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-200">
       <div class="flex justify-between items-center border-b border-slate-100 pb-3">
         <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
           <span class="material-symbols-outlined text-amber-600 text-[20px]">share</span>
@@ -1202,6 +1217,21 @@
 
     function fmtMoney(amount) {
       return new Intl.NumberFormat('vi-VN').format(Math.round(amount || 0)) + 'đ';
+    }
+
+    // Chống XSS: escape mọi dữ liệu do người dùng nhập (tên, biệt danh, ghi chú...) trước khi chèn vào innerHTML
+    function escapeHtml(value) {
+      if (value === null || value === undefined) return '';
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+    }
+
+    // Truyền tham số chuỗi an toàn vào thuộc tính onclick="fn(...)": JSON.stringify rồi escape HTML
+    function jsArg(value) {
+      return escapeHtml(JSON.stringify(value === undefined || value === null ? '' : value));
     }
 
     // Hàm tính tiền sân chia đều - Ưu tiên làm tròn LÊN hàng nghìn (Math.ceil)
@@ -1802,7 +1832,7 @@
                   <span class="material-symbols-outlined text-[14px]">visibility_off</span>
                 </button>
               </div>
-              <span class="text-[11px] text-slate-500 font-normal">${m.stadiumName || 'Sân 6h50'}</span>
+              <span class="text-[11px] text-slate-500 font-normal">${escapeHtml(m.stadiumName || 'Sân 6h50')}</span>
               ${m.pitchFee > 0 ? `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/70 mt-0.5" title="Tiền sân: ${fmtMoney(m.pitchFee)}">${fmtMoney(m.pitchFee)}</span>` : ''}
             </div>
           </th>
@@ -1877,10 +1907,10 @@
               </div>
               <div class="flex flex-col min-w-0">
                 <div class="flex items-center gap-1.5">
-                  <span onclick="openPlayerHistoryModal('${p.id}')" class="font-bold text-slate-900 truncate cursor-pointer hover:text-emerald-700" title="Xem lịch sử đóng quỹ của ${p.name}">${p.name}</span>
+                  <span onclick="openPlayerHistoryModal('${p.id}')" class="font-bold text-slate-900 truncate cursor-pointer hover:text-emerald-700" title="Xem lịch sử đóng quỹ của ${escapeHtml(p.name)}">${escapeHtml(p.name)}</span>
                   ${isDebt ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 border border-rose-200 font-bold">CHƯA ĐÓNG ĐỦ</span>` : hasPaid ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">ĐÃ ĐÓNG</span>` : ''}
                 </div>
-                <span class="text-xs text-slate-500 truncate">${p.nickname || 'Thành viên CLB'}</span>
+                <span class="text-xs text-slate-500 truncate">${escapeHtml(p.nickname || 'Thành viên CLB')}</span>
               </div>
             </div>
           </td>
@@ -1938,10 +1968,10 @@
         const suggestedAmt = isDebt ? Math.abs(p.balance) : 0;
         const actionsHtml = `
           <div class="flex items-center justify-center gap-1.5">
-            <button onclick="goToDepositPage('${p.id}', ${suggestedAmt})" class="px-2.5 py-1 rounded-lg ${isDebt ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'bg-amber-500 hover:bg-amber-600 text-white'} font-semibold text-xs flex items-center gap-1 shadow-2xs transition-all" title="Chọn mức giá đóng quỹ cho ${p.name}" type="button">
+            <button onclick="goToDepositPage('${p.id}', ${suggestedAmt})" class="px-2.5 py-1 rounded-lg ${isDebt ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'bg-amber-500 hover:bg-amber-600 text-white'} font-semibold text-xs flex items-center gap-1 shadow-2xs transition-all" title="Chọn mức giá đóng quỹ cho ${escapeHtml(p.name)}" type="button">
               <span class="material-symbols-outlined text-[15px]">payments</span> Đóng quỹ
             </button>
-            <button onclick="openPlayerHistoryModal('${p.id}')" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs flex items-center gap-1 transition-all border border-slate-200" title="Xem lịch sử đóng quỹ của ${p.name}" type="button">
+            <button onclick="openPlayerHistoryModal('${p.id}')" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs flex items-center gap-1 transition-all border border-slate-200" title="Xem lịch sử đóng quỹ của ${escapeHtml(p.name)}" type="button">
               <span class="material-symbols-outlined text-[15px]">history</span> Lịch sử
             </button>
             ${isAdmin() ? `
@@ -2124,8 +2154,8 @@
               </div>
               <div class="min-w-0">
                 <div class="flex items-center gap-1.5">
-                  <span onclick="openPlayerHistoryModal('${p.id}')" class="font-bold text-slate-900 text-sm truncate cursor-pointer hover:text-emerald-700">${p.name}</span>
-                  ${p.nickname ? `<span class="text-[11px] text-slate-500 truncate">(${p.nickname})</span>` : ''}
+                  <span onclick="openPlayerHistoryModal('${p.id}')" class="font-bold text-slate-900 text-sm truncate cursor-pointer hover:text-emerald-700">${escapeHtml(p.name)}</span>
+                  ${p.nickname ? `<span class="text-[11px] text-slate-500 truncate">(${escapeHtml(p.nickname)})</span>` : ''}
                 </div>
                 <div class="text-[10px] text-slate-400">Đã nộp: <strong class="text-amber-700 font-mono">${fmtMoney(p.totalPaid)}</strong></div>
               </div>
@@ -2139,28 +2169,28 @@
           <div class="flex items-center justify-between pt-2 border-t border-slate-100 gap-1.5">
             <!-- Điểm danh 1 chạm -->
             ${isPresent ? `
-              <button onclick="quickToggleMatrixCell('${currMatch.id}', '${p.id}')" class="flex-1 py-1.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition" type="button">
-                <span class="material-symbols-outlined text-[15px] text-emerald-600">sports_soccer</span>
+              <button onclick="quickToggleMatrixCell('${currMatch.id}', '${p.id}')" class="flex-1 min-h-[40px] py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition" type="button">
+                <span class="material-symbols-outlined text-[16px] text-emerald-600">sports_soccer</span>
                 <span>Có mặt</span>
                 <span class="text-[10px] text-emerald-700 font-extrabold">(-${fmtMoney(rec.feeCharged || pitchShare)})</span>
               </button>
             ` : `
-              <button onclick="quickToggleMatrixCell('${currMatch.id}', '${p.id}')" class="flex-1 py-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 transition" type="button">
-                <span class="material-symbols-outlined text-[15px] text-slate-400">block</span>
+              <button onclick="quickToggleMatrixCell('${currMatch.id}', '${p.id}')" class="flex-1 min-h-[40px] py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-semibold flex items-center justify-center gap-1 active:scale-95 transition" type="button">
+                <span class="material-symbols-outlined text-[16px] text-slate-400">block</span>
                 <span>Vắng mặt</span>
               </button>
             `}
 
             <!-- 2 nút thao tác nhanh -->
-            <button onclick="goToDepositPage('${p.id}', ${suggestedAmt})" class="px-2.5 py-1.5 rounded-xl ${isDebt ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'bg-amber-500 hover:bg-amber-600 text-white'} text-xs font-bold flex items-center gap-1 shadow-2xs active:scale-95 transition" title="Đóng quỹ cho ${p.name}">
-              <span class="material-symbols-outlined text-[15px]">payments</span> Nộp
+            <button onclick="goToDepositPage('${p.id}', ${suggestedAmt})" class="min-h-[40px] px-3 py-2 rounded-xl ${isDebt ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'bg-amber-500 hover:bg-amber-600 text-white'} text-xs font-bold flex items-center gap-1 shadow-2xs active:scale-95 transition" title="Đóng quỹ cho ${escapeHtml(p.name)}">
+              <span class="material-symbols-outlined text-[16px]">payments</span> Nộp
             </button>
-            <button onclick="openPlayerHistoryModal('${p.id}')" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 flex items-center gap-0.5 active:scale-95 transition" title="Xem lịch sử">
-              <span class="material-symbols-outlined text-[15px]">history</span>
+            <button onclick="openPlayerHistoryModal('${p.id}')" class="min-h-[40px] min-w-[40px] px-2 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 flex items-center justify-center active:scale-95 transition" title="Xem lịch sử">
+              <span class="material-symbols-outlined text-[16px]">history</span>
             </button>
             ${isAdmin() ? `
-              <button onclick="openEditPlayerModal('${p.id}')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center border border-slate-200 active:scale-95 transition" title="Sửa">
-                <span class="material-symbols-outlined text-[14px]">edit</span>
+              <button onclick="openEditPlayerModal('${p.id}')" class="min-h-[40px] w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center border border-slate-200 active:scale-95 transition" title="Sửa">
+                <span class="material-symbols-outlined text-[15px]">edit</span>
               </button>
             ` : ''}
           </div>
@@ -2238,7 +2268,7 @@
         notice.className = "mt-2 p-3 rounded-xl bg-rose-50 border border-rose-200 flex flex-wrap items-center justify-between gap-2 text-xs";
         notice.innerHTML = `
           <div>
-            <span class="font-bold text-rose-800">${player.name}</span> đang thiếu quỹ <strong class="text-rose-600 font-extrabold">${fmtMoney(debtAmt)}</strong>
+            <span class="font-bold text-rose-800">${escapeHtml(player.name)}</span> đang thiếu quỹ <strong class="text-rose-600 font-extrabold">${fmtMoney(debtAmt)}</strong>
             <span class="text-slate-500 ml-1">(Tổng đã đóng: ${fmtMoney(player.totalPaid)})</span>
           </div>
           <button type="button" onclick="selectDepositTier(${debtAmt})" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition">
@@ -2249,11 +2279,11 @@
         notice.className = "mt-2 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-wrap items-center justify-between gap-2 text-xs";
         notice.innerHTML = `
           <div>
-            <span class="font-bold text-emerald-900">${player.name}</span> hiện có số dư <strong class="text-emerald-700 font-extrabold">+${fmtMoney(player.balance)}</strong>
+            <span class="font-bold text-emerald-900">${escapeHtml(player.name)}</span> hiện có số dư <strong class="text-emerald-700 font-extrabold">+${fmtMoney(player.balance)}</strong>
             <span class="text-slate-500 ml-1">(Tổng đã đóng: ${fmtMoney(player.totalPaid)})</span>
           </div>
           <button type="button" onclick="openPlayerHistoryModal('${player.id}')" class="text-emerald-700 font-bold underline">
-            Xem lịch sử của ${player.name}
+            Xem lịch sử của ${escapeHtml(player.name)}
           </button>
         `;
       }
@@ -2430,19 +2460,19 @@
         div.className = "p-3 rounded-xl bg-amber-50/70 border border-amber-200 flex items-center justify-between gap-2 text-xs";
         div.innerHTML = `
           <div>
-            <div class="font-bold text-slate-900">${req.playerName} <span class="text-emerald-700 font-extrabold">+${fmtMoney(req.amount)}</span></div>
-            <div class="text-[11px] text-slate-500">${req.note || 'Chuyển khoản nạp quỹ'} • ${req.depositDate}</div>
+            <div class="font-bold text-slate-900">${escapeHtml(req.playerName)} <span class="text-emerald-700 font-extrabold">+${fmtMoney(req.amount)}</span></div>
+            <div class="text-[11px] text-slate-500">${escapeHtml(req.note || 'Chuyển khoản nạp quỹ')} • ${escapeHtml(req.depositDate)}</div>
           </div>
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 flex-shrink-0">
             ${isAdmin() ? `
-              <button onclick="adminApprovePendingDeposit('${req.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
-                <span class="material-symbols-outlined text-[15px]">check_box</span> Tick Duyệt
+              <button onclick="adminApprovePendingDeposit('${req.id}')" class="min-h-[40px] px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95" type="button">
+                <span class="material-symbols-outlined text-[16px]">check_box</span> Tick Duyệt
               </button>
-              <button onclick="adminRejectPendingDeposit('${req.id}')" class="p-1.5 rounded-lg bg-slate-200 hover:bg-rose-100 text-slate-600 hover:text-rose-700 transition active:scale-95" title="Từ chối yêu cầu">
-                <span class="material-symbols-outlined text-[15px]">close</span>
+              <button onclick="adminRejectPendingDeposit('${req.id}')" class="min-h-[40px] min-w-[40px] p-2 rounded-xl bg-slate-200 hover:bg-rose-100 text-slate-600 hover:text-rose-700 flex items-center justify-center transition active:scale-95" title="Từ chối yêu cầu" type="button">
+                <span class="material-symbols-outlined text-[16px]">close</span>
               </button>
             ` : `
-              <span class="px-2 py-1 rounded bg-amber-100 text-amber-800 font-semibold text-[11px]">Chờ Thủ quỹ tick</span>
+              <span class="px-2.5 py-1.5 rounded-lg bg-amber-100 text-amber-800 font-semibold text-[11px]">Chờ duyệt</span>
             `}
           </div>
         `;
@@ -2523,7 +2553,7 @@
           <div class="flex items-center gap-2.5 min-w-0">
             <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-[11px] flex items-center justify-center flex-shrink-0">#${String(idx + 1).padStart(2, '0')}</span>
             <div class="min-w-0">
-              <div class="font-bold text-slate-900 text-xs truncate">${p.name}</div>
+              <div class="font-bold text-slate-900 text-xs truncate">${escapeHtml(p.name)}</div>
               <div class="text-[11px] text-slate-500">${totalTimes} lần đóng quỹ</div>
             </div>
           </div>
@@ -2551,6 +2581,23 @@
       // Build unified list of all deposit events (Direct + Match addedDeposit + Initial)
       const combinedEvents = [];
 
+      // 1. Quỹ nạp ban đầu (nếu có)
+      players.forEach(p => {
+        if (filterPlayerId !== 'ALL' && p.id !== filterPlayerId) return;
+        if ((p.initialDeposit || 0) > 0) {
+          combinedEvents.push({
+            id: null,
+            playerId: p.id,
+            playerName: p.name,
+            amount: p.initialDeposit,
+            note: 'Số dư quỹ ban đầu',
+            date: p.createdAt ? p.createdAt.split('T')[0] : '',
+            canDelete: false
+          });
+        }
+      });
+
+      // 2. Các lần nạp trực tiếp ngoài trận
       allDeposits.forEach(d => {
         if (filterPlayerId === 'ALL' || d.playerId === filterPlayerId) {
           combinedEvents.push({
@@ -2565,6 +2612,7 @@
         }
       });
 
+      // 3. Các lần nạp đóng thêm trực tiếp tại trận
       players.forEach(p => {
         if (filterPlayerId !== 'ALL' && p.id !== filterPlayerId) return;
         if (p.matchRecords) {
@@ -2586,6 +2634,9 @@
         }
       });
 
+      // Sắp xếp ngày mới nhất lên đầu
+      combinedEvents.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
       countEl.textContent = `${combinedEvents.length} lần đóng`;
 
       if (combinedEvents.length === 0) {
@@ -2599,10 +2650,10 @@
         tr.className = "hover:bg-slate-50 transition-colors";
         tr.innerHTML = `
           <td class="p-3 font-bold text-slate-900">
-            <button onclick="openPlayerHistoryModal('${ev.playerId}')" class="hover:text-emerald-700 hover:underline text-left">${ev.playerName}</button>
+            <button onclick="openPlayerHistoryModal('${ev.playerId}')" class="hover:text-emerald-700 hover:underline text-left">${escapeHtml(ev.playerName)}</button>
           </td>
           <td class="p-3 text-right font-mono font-extrabold text-emerald-700 tabular-nums">+${fmtMoney(ev.amount)}</td>
-          <td class="p-3 text-slate-600">${ev.note}</td>
+          <td class="p-3 text-slate-600">${escapeHtml(ev.note)}</td>
           <td class="p-3 text-slate-500 font-mono text-xs">${ev.date}</td>
           <td class="p-3 text-center">
             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
@@ -2611,7 +2662,7 @@
           </td>
           <td class="p-3 text-center">
             ${ev.canDelete && isAdmin() ? `
-              <button onclick="handleDeleteDeposit('${ev.id}', '${ev.playerName}', ${ev.amount})" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Xóa khoản đóng này">
+              <button onclick="handleDeleteDeposit(${jsArg(ev.id)}, ${jsArg(ev.playerName)}, ${Number(ev.amount) || 0})" class="text-slate-400 hover:text-rose-600 p-1 transition" title="Xóa khoản đóng này">
                 <span class="material-symbols-outlined text-[18px]">delete</span>
               </button>
             ` : `<span class="text-slate-300">-</span>`}
@@ -2689,7 +2740,7 @@
         html += `
           <div class="flex justify-between items-center p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70">
             <div>
-              <div class="font-bold text-slate-800">${d.note || 'Đóng quỹ CLB'}</div>
+              <div class="font-bold text-slate-800">${escapeHtml(d.note || 'Đóng quỹ CLB')}</div>
               <div class="text-[11px] text-slate-500">Ngày: ${dStr}</div>
             </div>
             <span class="font-bold text-emerald-700 tabular-nums">+${fmtMoney(d.amount)}</span>
@@ -2703,7 +2754,7 @@
         html += `
           <div class="flex justify-between items-center p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70">
             <div>
-              <div class="font-bold text-slate-800">Đóng trực tiếp tại ${md.match.title || 'Trận CN'}</div>
+              <div class="font-bold text-slate-800">Đóng trực tiếp tại ${escapeHtml(md.match.title || 'Trận CN')}</div>
               <div class="text-[11px] text-slate-500">Ngày: ${dayStr}</div>
             </div>
             <span class="font-bold text-emerald-700 tabular-nums">+${fmtMoney(md.amount)}</span>
@@ -2727,8 +2778,8 @@
           html += `
             <div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
               <div>
-                <div class="font-bold text-slate-900">${m.title || 'Trận CN'} (${dayStr})</div>
-                <div class="text-[11px] text-slate-500">${m.stadiumName || 'Sân 6h50'} ${rec.hasDrinks ? '• Có uống nước (+10k)' : ''}</div>
+                <div class="font-bold text-slate-900">${escapeHtml(m.title || 'Trận CN')} (${dayStr})</div>
+                <div class="text-[11px] text-slate-500">${escapeHtml(m.stadiumName || 'Sân 6h50')} ${rec.hasDrinks ? '• Có uống nước (+10k)' : ''}</div>
               </div>
               <div class="font-bold text-rose-600 tabular-nums">-${fmtMoney(rec.feeCharged)}</div>
             </div>
@@ -2847,7 +2898,8 @@
         csv += row.map(c => `"${c}"`).join(',') + '\n';
       });
 
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const BOM = '﻿';
+      const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -2923,26 +2975,26 @@
         row.id = `att-row-${rec.playerId}`;
 
         row.innerHTML = `
-          <div class="flex items-center gap-3 min-w-[180px]">
+          <div class="flex items-center gap-3 min-w-[170px] py-1">
             <input type="checkbox" ${dis}
                    id="chk-present-${rec.playerId}"
                    ${rec.isPresent ? 'checked' : ''}
                    onchange="onAttendanceToggle('${rec.playerId}')"
-                   class="w-4 h-4 text-emerald-600 rounded border-slate-300 cursor-pointer focus:ring-emerald-500"/>
+                   class="w-5 h-5 text-emerald-600 rounded-md border-slate-300 cursor-pointer focus:ring-emerald-500"/>
             <label for="chk-present-${rec.playerId}" class="cursor-pointer select-none">
-              <div class="font-bold text-slate-900 text-sm">${rec.playerName}</div>
-              ${rec.playerNickname ? `<div class="text-xs text-slate-500">(${rec.playerNickname})</div>` : ''}
+              <div class="font-bold text-slate-900 text-sm leading-tight">${escapeHtml(rec.playerName)}</div>
+              ${rec.playerNickname ? `<div class="text-xs text-slate-500">(${escapeHtml(rec.playerNickname)})</div>` : ''}
             </label>
           </div>
 
-          <div class="flex items-center gap-2 bg-amber-50/70 px-3 py-1.5 rounded-xl border border-amber-200/80">
+          <div class="flex items-center gap-2 bg-amber-50/70 px-3 py-1.5 rounded-xl border border-amber-200/80 min-h-[36px]">
             <input type="checkbox" ${dis}
                    id="chk-drink-${rec.playerId}"
                    ${rec.hasDrinks ? 'checked' : ''}
                    onchange="onDrinksToggle('${rec.playerId}')"
-                   class="w-4 h-4 text-amber-600 rounded border-amber-300 cursor-pointer focus:ring-amber-500"/>
+                   class="w-5 h-5 text-amber-600 rounded-md border-amber-300 cursor-pointer focus:ring-amber-500"/>
             <label for="chk-drink-${rec.playerId}" class="text-xs font-semibold text-amber-900 cursor-pointer select-none flex items-center gap-1">
-              <span class="material-symbols-outlined text-[15px] text-amber-600">local_drink</span> Uống nước (+10k)
+              <span class="material-symbols-outlined text-[16px] text-amber-600">local_drink</span> Uống nước (+10k)
             </label>
           </div>
 
@@ -2953,21 +3005,21 @@
                    value="${rec.feeCharged || 0}"
                    step="5000"
                    oninput="recalcMatchLive()"
-                   class="w-24 text-center text-xs font-bold font-mono py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-rose-600 focus:border-emerald-500 focus:outline-none"/>
+                   class="w-24 text-center text-xs font-bold font-mono py-2 rounded-xl border border-slate-200 bg-slate-50 text-rose-600 focus:border-emerald-500 focus:outline-none"/>
             <span class="text-slate-400">đ</span>
           </div>
 
           <div class="flex items-center gap-1.5 text-xs">
             <span class="text-emerald-700 font-bold">Đóng tại sân:</span>
             <div class="relative">
-              <span class="absolute left-2.5 top-1.5 text-emerald-600 font-bold">+</span>
+              <span class="absolute left-2.5 top-2 text-emerald-600 font-bold">+</span>
               <input type="number" ${dis}
                      id="add-${rec.playerId}"
                      value="${rec.addedDeposit || 0}"
                      step="10000"
                      oninput="recalcMatchLive()"
                      placeholder="0"
-                     class="w-24 pl-5 text-center text-xs font-bold font-mono py-1.5 rounded-lg border border-emerald-200 bg-emerald-50/50 text-emerald-700 focus:border-emerald-500 focus:outline-none"/>
+                     class="w-24 pl-5 text-center text-xs font-bold font-mono py-2 rounded-xl border border-emerald-200 bg-emerald-50/50 text-emerald-700 focus:border-emerald-500 focus:outline-none"/>
             </div>
             <span class="text-slate-400">đ</span>
           </div>
@@ -3125,7 +3177,7 @@
           item.className = "rounded-xl bg-white p-3.5 border border-rose-200 shadow-xs flex items-center justify-between text-xs";
           item.innerHTML = `
             <div>
-              <div class="font-bold text-slate-900 text-sm">${d.name}</div>
+              <div class="font-bold text-slate-900 text-sm">${escapeHtml(d.name)}</div>
               <div class="font-mono text-rose-600 font-extrabold text-sm mt-0.5">${fmtMoney(d.balance)}</div>
             </div>
             <button onclick="goToDepositPage('${d.id}', ${Math.abs(d.balance)})" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs flex items-center gap-1 transition">
@@ -3150,9 +3202,9 @@
             <div>
               <div class="flex items-center gap-1.5">
                 <span class="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">#${numStr}</span>
-                <span class="font-bold text-base text-slate-900">${p.name}</span>
+                <span class="font-bold text-base text-slate-900">${escapeHtml(p.name)}</span>
               </div>
-              <div class="text-xs text-slate-500 mt-1">${p.nickname || 'Thành viên CLB'}</div>
+              <div class="text-xs text-slate-500 mt-1">${escapeHtml(p.nickname || 'Thành viên CLB')}</div>
             </div>
             <span class="inline-block px-2.5 py-1 rounded-full text-xs font-extrabold tabular-nums border ${isDebt ? 'bg-rose-100 text-rose-800 border-rose-300' : isCredit ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-200'}">
               ${(p.balance > 0 ? '+' : '') + fmtMoney(p.balance)}
@@ -3172,17 +3224,17 @@
 
           <div class="flex justify-between items-center pt-2 border-t border-slate-100 text-xs">
             <div class="flex items-center gap-1.5">
-              <button onclick="goToDepositPage('${p.id}', ${isDebt ? Math.abs(p.balance) : 0})" class="font-bold px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg flex items-center gap-1 transition">
-                <span class="material-symbols-outlined text-[15px]">payments</span> Đóng quỹ
+              <button onclick="goToDepositPage('${p.id}', ${isDebt ? Math.abs(p.balance) : 0})" class="min-h-[38px] px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl flex items-center gap-1 active:scale-95 transition">
+                <span class="material-symbols-outlined text-[16px]">payments</span> Đóng quỹ
               </button>
-              <button onclick="openPlayerHistoryModal('${p.id}')" class="font-semibold px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-200 flex items-center gap-1 transition">
-                <span class="material-symbols-outlined text-[15px]">history</span> Lịch sử
+              <button onclick="openPlayerHistoryModal('${p.id}')" class="min-h-[38px] px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl border border-slate-200 flex items-center gap-1 active:scale-95 transition">
+                <span class="material-symbols-outlined text-[16px]">history</span> Lịch sử
               </button>
             </div>
             ${isAdmin() ? `
-              <div class="space-x-2">
-                <button onclick="openEditPlayerModal('${p.id}')" class="text-slate-500 hover:text-emerald-700 font-semibold transition">Sửa</button>
-                <button onclick="handleDeletePlayer('${p.id}', '${p.name}')" class="text-slate-400 hover:text-rose-600 font-semibold transition">Xóa</button>
+              <div class="flex items-center gap-2">
+                <button onclick="openEditPlayerModal('${p.id}')" class="min-h-[38px] px-2.5 text-slate-600 hover:text-emerald-700 font-bold transition">Sửa</button>
+                <button onclick="handleDeletePlayer(${jsArg(p.id)}, ${jsArg(p.name)})" class="min-h-[38px] px-2 text-slate-400 hover:text-rose-600 font-bold transition">Xóa</button>
               </div>
             ` : ''}
           </div>
@@ -3205,9 +3257,9 @@
         const isHidden = hiddenMatchIds.has(m.id);
 
         tr.innerHTML = `
-          <td class="p-4 font-bold text-slate-900">${m.title || 'Trận đấu'}</td>
-          <td class="p-4 font-mono text-emerald-700 font-semibold">CN ${dayLabel} (${m.timeSlot || '06:00 - 07:30'})</td>
-          <td class="p-4 text-slate-600">${m.stadiumName || 'Sân bóng 6h50'}</td>
+          <td class="p-4 font-bold text-slate-900">${escapeHtml(m.title || 'Trận đấu')}</td>
+          <td class="p-4 font-mono text-emerald-700 font-semibold">CN ${dayLabel} (${escapeHtml(m.timeSlot || '06:00 - 07:30')})</td>
+          <td class="p-4 text-slate-600">${escapeHtml(m.stadiumName || 'Sân bóng 6h50')}</td>
           <td class="p-4 text-center font-bold text-slate-900">${m.attendingCount || 0} người</td>
           <td class="p-4 text-right font-mono font-bold text-amber-700">${fmtMoney(m.pitchFee)}</td>
           <td class="p-4 text-center">
@@ -3216,19 +3268,21 @@
             </span>
           </td>
           <td class="p-4 text-center">
-            <button onclick="toggleHideSingleMatch('${m.id}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold border ${isHidden ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-700 border-slate-200'} transition">
+            <button onclick="toggleHideSingleMatch('${m.id}')" class="min-h-[36px] px-3 py-1.5 rounded-xl text-xs font-semibold border ${isHidden ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-700 border-slate-200'} active:scale-95 transition">
               ${isHidden ? 'Đang ẩn' : 'Đang hiện'}
             </button>
           </td>
-          <td class="p-4 text-center space-x-2">
-            <button onclick="onSelectMatch('${m.id}'); switchTab('match');" class="text-emerald-600 hover:text-emerald-800 font-bold" title="Xem điểm danh trận này">
-              <span class="material-symbols-outlined text-[19px]">checklist</span>
-            </button>
-            ${isAdmin() ? `
-              <button onclick="handleDeleteMatch('${m.id}', '${m.title}')" class="text-slate-400 hover:text-rose-600" title="Xóa trận">
-                <span class="material-symbols-outlined text-[19px]">delete</span>
+          <td class="p-4 text-center">
+            <div class="inline-flex items-center gap-1.5">
+              <button onclick="onSelectMatch('${m.id}'); switchTab('match');" class="min-h-[36px] min-w-[36px] rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 inline-flex items-center justify-center active:scale-95 transition" title="Xem điểm danh trận này">
+                <span class="material-symbols-outlined text-[18px]">checklist</span>
               </button>
-            ` : ''}
+              ${isAdmin() ? `
+                <button onclick="handleDeleteMatch(${jsArg(m.id)}, ${jsArg(m.title)})" class="min-h-[36px] min-w-[36px] rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 inline-flex items-center justify-center active:scale-95 transition" title="Xóa trận">
+                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+              ` : ''}
+            </div>
           </td>
         `;
         tbody.appendChild(tr);
@@ -3288,7 +3342,7 @@
         row.innerHTML = `
           <div class="flex items-center gap-2.5">
             <input type="checkbox" id="vis-${m.id}" ${isVisible ? 'checked' : ''} class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"/>
-            <span class="font-bold text-slate-800 text-xs">${m.title || 'Trận CN ' + dayLabel}</span>
+            <span class="font-bold text-slate-800 text-xs">${escapeHtml(m.title || 'Trận CN ' + dayLabel)}</span>
           </div>
           <span class="text-[11px] text-emerald-700 font-mono font-semibold">CN ${dayLabel}</span>
         `;
@@ -3422,7 +3476,7 @@
       const p = players.find(x => x.id === playerId);
       if (!p) return;
       document.getElementById('editPlayerId').value = p.id;
-      document.getElementById('modalPlayerTitle').innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-[20px]">edit</span> Sửa thông tin: ${p.name}`;
+      document.getElementById('modalPlayerTitle').innerHTML = `<span class="material-symbols-outlined text-emerald-600 text-[20px]">edit</span> Sửa thông tin: ${escapeHtml(p.name)}`;
       document.getElementById('inputPlayerName').value = p.name;
       document.getElementById('inputPlayerNickname').value = p.nickname || '';
       document.getElementById('inputPlayerPhone').value = p.phoneNumber || '';
@@ -3493,8 +3547,8 @@
     }
 
     function copyTransferInfo() {
-      navigator.clipboard?.writeText(`0362226752 PHAM TRONG CANH FC6H DONG QUY`);
-      showToast('Đã sao chép STK 0362226752 (PHAM TRONG CANH)!', 'content_copy');
+      navigator.clipboard?.writeText(`${clubConfig.bankAccount} ${clubConfig.accountHolder} FC6H DONG QUY`);
+      showToast(`Đã sao chép STK ${clubConfig.bankAccount} (${clubConfig.accountHolder})!`, 'content_copy');
     }
 
     function openZaloModal() {

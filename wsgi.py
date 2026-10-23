@@ -11,10 +11,12 @@ if PROJECT_DIR not in sys.path:
     sys.path.insert(0, PROJECT_DIR)
 
 from db import init_db
-from server import FCRequestHandler, PUBLIC_DIR
+from server import FCRequestHandler, PUBLIC_DIR, ADMIN_PASSWORD, DEFAULT_ADMIN_PASSWORD, MAX_BODY_BYTES
 
 # Initialize database on startup
 init_db()
+if ADMIN_PASSWORD == DEFAULT_ADMIN_PASSWORD:
+    print("[CẢNH BÁO] Đang dùng mật khẩu Admin mặc định. Hãy đặt biến môi trường ADMIN_PASSWORD!", file=sys.stderr)
 
 class WSGIResponseContext:
     def __init__(self, environ, start_response):
@@ -39,7 +41,7 @@ class WSGIResponseContext:
             length = int(self.environ.get("CONTENT_LENGTH", 0) or 0)
         except (ValueError, TypeError):
             length = 0
-        if length == 0:
+        if length <= 0 or length > MAX_BODY_BYTES:
             return {}
         stream = self.environ.get("wsgi.input")
         if not stream:
@@ -101,6 +103,7 @@ def application(environ, start_response):
             403: "Forbidden",
             404: "Not Found",
             405: "Method Not Allowed",
+            429: "Too Many Requests",
             500: "Internal Server Error"
         }.get(ctx.status_code, "OK")
 

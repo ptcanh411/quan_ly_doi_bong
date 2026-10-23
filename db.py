@@ -6,9 +6,17 @@ from datetime import datetime, timedelta
 DB_FILE = os.path.join(os.path.dirname(__file__), "fc_club.db")
 
 def get_connection():
-    conn = sqlite3.connect(DB_FILE)
+    # timeout: chờ tối đa 20s khi DB đang bị khóa ghi thay vì báo lỗi "database is locked" ngay
+    conn = sqlite3.connect(DB_FILE, timeout=20.0)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
+    # WAL: cho phép đọc và ghi song song (ThreadingHTTPServer / nhiều worker WSGI)
+    try:
+        conn.execute("PRAGMA journal_mode = WAL;")
+        conn.execute("PRAGMA synchronous = NORMAL;")
+    except sqlite3.DatabaseError:
+        pass  # Một số hệ thống file không hỗ trợ WAL -> giữ chế độ mặc định
+    conn.execute("PRAGMA busy_timeout = 20000;")
     return conn
 
 def init_db():

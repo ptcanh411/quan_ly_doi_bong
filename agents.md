@@ -229,6 +229,30 @@ Dữ liệu gồm 25 thành viên và 5 trận đấu đã diễn ra (19/9, 27/9
 - **Sao lưu & Khôi phục (Backup / Restore)**: Tích hợp chức năng xuất/nhập toàn bộ cơ sở dữ liệu dạng file `.json` 1-click.
 - **Máy chủ đa luồng**: Nâng cấp `server.py` lên `ThreadingHTTPServer` và bật `PRAGMA foreign_keys = ON;` trong `db.py`.
 
+### Milestone 5: Code Review & Senior Fullstack hardening
+- **Chống Stored XSS (frontend)**: thêm `escapeHtml()` và `jsArg()` trong `public/index.html`; toàn bộ tên, biệt danh, ghi chú, tên trận, sân... chèn vào `innerHTML` hoặc `onclick` đều được escape.
+- **SQLite**: `get_connection()` dùng `timeout=20`, `busy_timeout`, `journal_mode=WAL`, `synchronous=NORMAL` để tránh lỗi `database is locked`. File phụ `*.db-wal`, `*.db-shm` đã thêm vào `.gitignore`.
+- **Bảo mật đăng nhập Admin**: so sánh mật khẩu bằng `hmac.compare_digest`; giới hạn 5 lần sai/IP và 30 lần sai toàn hệ thống trong 5 phút (HTTP 429); dọn token hết hạn mỗi lần đăng nhập; cảnh báo khi còn dùng mật khẩu mặc định.
+- **Toàn vẹn dữ liệu**: `/api/batch-save`, `/api/restore` và các handler POST/PUT/DELETE tự `rollback` khi gặp dữ liệu sai; giới hạn kích thước body (10MB) và số tiền nạp tối đa (100 triệu); kiểm tra thành viên tồn tại khi gửi yêu cầu nạp tiền.
+- **Hết hardcode STK**: `copyTransferInfo()` đọc từ `clubConfig`.
+- Công thức tài chính (`TotalPaid`, `TotalUsed`, `Balance`, làm tròn tiền sân) giữ nguyên, không thay đổi.
+
+### Milestone 6: Tối ưu UI/UX Mobile toàn diện & Hoàn thiện WSGI
+- **Chống tràn chữ & số tiền trên màn hình nhỏ (360px - 390px)**: Refactor 3 thẻ tóm tắt KPI (`ĐỦ QUỸ`, `CHƯA NỘP`, `QUỸ CÒN`) với gap `gap-1.5 sm:gap-3`, padding `p-2 sm:px-4 sm:py-3`, cỡ chữ linh hoạt `text-[11px] sm:text-xl font-extrabold` và `truncate`, không bị nhảy dòng hay tràn lề khi quỹ lên đến hàng triệu đồng.
+- **Chuẩn công thái học ngón tay cái (Touch Targets ≥ 40px)**: 
+  - Thẻ Mobile (`renderMobileCards`): Nút *"Có mặt / Vắng mặt"*, *"Nộp"*, *"Lịch sử"*, *"Sửa"* đạt chiều cao tối thiểu `min-h-[40px]`, vùng chạm rộng rãi, không bấm nhầm.
+  - Thẻ Thành viên (`renderMembersTab`): Nút *"Đóng quỹ"*, *"Lịch sử"* và nút quản trị đạt `min-h-[38px]`.
+  - Thẻ Điểm danh trận: Checkbox có mặt & uống nước tăng kích thước `w-5 h-5` dễ bấm trên sân, ô nhập tiền `py-2 rounded-xl`.
+  - Mức nạp gợi ý: 6 nút bấm số tiền (`20k` đến `500k`) đạt `min-h-[38px]`, kèm hiệu ứng chạm nhạy `active:scale-95`.
+  - Nút thao tác nhanh Lịch trận (`renderScheduleTab`): Nút xem điểm danh và xóa trận dạng khối vuông `36px x 36px`.
+- **Ngăn chặn iOS Safari tự phóng to**: Ép cỡ chữ `font-size: 16px !important` cho toàn bộ input/select trên màn hình `< 640px` để trải nghiệm nhập liệu tự nhiên, không làm vỡ viewport.
+- **Tối ưu không gian cuộn và Modal**:
+  - Tăng khoảng trống chân trang `pb-24 sm:pb-20` của `<main>` giúp danh sách thành viên không bị che khuất bởi thanh điều khiển nổi (Floating Status Dock).
+  - Bổ sung `max-h-[90vh]` và `overflow-y-auto` cho tất cả các hộp thoại Modal (Đăng nhập, Thêm thành viên, Lập lịch trận, Ẩn/Hiện cột, Báo cáo Zalo) giúp mở trên điện thoại có bàn phím ảo hiển thị mượt mà, cuộn trơn tru.
+  - Bổ sung `touch-action: manipulation; -webkit-tap-highlight-color: transparent;` loại bỏ độ trễ 300ms khi chạm trên màn hình cảm ứng.
+- **Đồng bộ bảo vệ WSGI (`wsgi.py`)**: Giới hạn kích thước payload `MAX_BODY_BYTES = 10MB` chuẩn hóa cả hai môi trường cục bộ và PythonAnywhere.
+- **Xuất Excel UTF-8 BOM**: Thêm byte order mark `﻿` khi xuất CSV để mở bằng Microsoft Excel hiển thị tiếng Việt có dấu chuẩn 100%.
+
 ---
 
 ## 7. HƯỚNG DẪN TRIỂN KHAI TRÊN PYTHONANYWHERE

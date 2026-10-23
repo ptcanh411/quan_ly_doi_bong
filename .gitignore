@@ -3,3 +3,7 @@ node_modules/
 __pycache__/
 *.pyc
 .env*.local
+# SQLite WAL mode sinh thêm file phụ khi server đang chạy
+*.db-wal
+*.db-shm
+.claude/

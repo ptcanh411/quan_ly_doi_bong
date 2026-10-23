@@ -7,13 +7,69 @@ import uuid
 import sys
 import io
 import secrets
+import hmac
+import time
+import threading
 from datetime import datetime, timedelta
 import sqlite3
 from db import get_connection, init_db, seed_db
 
 PORT = int(os.environ.get("PORT", 8000))
 PUBLIC_DIR = os.path.join(os.path.dirname(__file__), "public")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "ptcanh411")
+DEFAULT_ADMIN_PASSWORD = "ptcanh411"
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", DEFAULT_ADMIN_PASSWORD)
+
+MAX_BODY_BYTES = 10 * 1024 * 1024      # Giới hạn body request (đủ cho file backup JSON)
+MAX_DEPOSIT_AMOUNT = 100_000_000       # Chặn số tiền nạp phi lý (100 triệu)
+
+# ---------------- Chống brute-force đăng nhập Admin ----------------
+LOGIN_MAX_FAILS_PER_IP = 5
+LOGIN_MAX_FAILS_GLOBAL = 30
+LOGIN_WINDOW_SECONDS = 300
+_login_fails = {}                      # ip -> [timestamps thất bại]
+_login_lock = threading.Lock()
+
+
+def get_client_ip(handler):
+    """IP client, dùng chung cho server.py (client_address) và wsgi.py (environ)."""
+    fwd = handler.get_header("X-Forwarded-For")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    addr = getattr(handler, "client_address", None)
+    if addr:
+        return addr[0]
+    env = getattr(handler, "environ", None)
+    if env:
+        return env.get("REMOTE_ADDR", "unknown")
+    return "unknown"
+
+
+def _recent_fails(ip, now):
+    fails = [t for t in _login_fails.get(ip, []) if now - t < LOGIN_WINDOW_SECONDS]
+    if fails:
+        _login_fails[ip] = fails
+    else:
+        _login_fails.pop(ip, None)
+    return fails
+
+
+def login_blocked(ip):
+    now = time.time()
+    with _login_lock:
+        if len(_recent_fails(ip, now)) >= LOGIN_MAX_FAILS_PER_IP:
+            return True
+        total = sum(len(_recent_fails(k, now)) for k in list(_login_fails.keys()))
+        return total >= LOGIN_MAX_FAILS_GLOBAL
+
+
+def record_login_fail(ip):
+    with _login_lock:
+        _login_fails.setdefault(ip, []).append(time.time())
+
+
+def clear_login_fails(ip):
+    with _login_lock:
+        _login_fails.pop(ip, None)
 
 def is_admin_request(handler):
     token = handler.get_header("X-Admin-Token")
@@ -73,8 +129,11 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
         return default
 
     def read_body(self):
-        content_length = int(self.headers.get("Content-Length", 0))
-        if content_length == 0:
+        try:
+            content_length = int(self.headers.get("Content-Length", 0))
+        except (ValueError, TypeError):
+            content_length = 0
+        if content_length <= 0 or content_length > MAX_BODY_BYTES:
             return {}
         body = self.rfile.read(content_length).decode("utf-8")
         try:
@@ -278,8 +337,15 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
         try:
             # 1. Admin Authentication Login
             if path == "/api/auth/login":
+                ip = get_client_ip(self)
+                if login_blocked(ip):
+                    return self.send_json({"error": "Đăng nhập sai quá nhiều lần. Vui lòng thử lại sau 5 phút."}, 429)
+
                 pwd = (body.get("password") or "").strip()
-                if pwd == ADMIN_PASSWORD:
+                if hmac.compare_digest(pwd.encode("utf-8"), ADMIN_PASSWORD.encode("utf-8")):
+                    clear_login_fails(ip)
+                    # Dọn các token đã hết hạn (garbage collection)
+                    cur.execute("DELETE FROM admin_tokens WHERE expiresAt IS NOT NULL AND expiresAt <= ?", (now,))
                     token = "tok-" + secrets.token_hex(24)
                     expires = (datetime.now() + timedelta(days=30)).isoformat()
                     cur.execute("INSERT INTO admin_tokens (token, createdAt, expiresAt) VALUES (?, ?, ?)", (token, now, expires))
@@ -291,6 +357,7 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                         "message": "Đăng nhập Admin thành công!"
                     })
                 else:
+                    record_login_fail(ip)
                     return self.send_json({"error": "Mật khẩu Admin không chính xác!"}, 401)
 
             elif path == "/api/auth/logout":
@@ -304,12 +371,15 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
             elif path == "/api/deposit-requests":
                 player_id = body.get("playerId")
                 amount = float(body.get("amount", 0))
-                note = body.get("note", "").strip() or "Chuyển khoản nạp quỹ"
+                note = (body.get("note") or "").strip()[:200] or "Chuyển khoản nạp quỹ"
                 deposit_date = body.get("depositDate") or now[:10]
 
-                if not player_id or amount <= 0:
+                if not player_id or amount <= 0 or amount > MAX_DEPOSIT_AMOUNT:
                     return self.send_json({"error": "Vui lòng chọn thành viên và số tiền nạp hợp lệ"}, 400)
 
+                cur.execute("SELECT id FROM players WHERE id = ? AND isActive = 1", (player_id,))
+                if not cur.fetchone():
+                    return self.send_json({"error": "Thành viên không tồn tại"}, 400)
                 req_id = "req-" + str(uuid.uuid4())[:8]
                 cur.execute("""
                 INSERT INTO deposit_requests (id, playerId, amount, depositDate, note, status, createdAt)
@@ -468,32 +538,37 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
                 if not require_admin(self):
                     return
                 updates = body.get("updates", [])
-                for u in updates:
-                    mid = u.get("matchId")
-                    pid = u.get("playerId")
-                    if not mid or not pid:
-                        continue
-                    added = float(u.get("addedDeposit", 0))
-                    fee = float(u.get("feeCharged", 0))
-                    if "isPresent" in u:
-                        is_present = 1 if u.get("isPresent") else 0
-                    else:
-                        is_present = 1 if fee > 0 else 0
-                    pitch_share = float(u.get("pitchShare", fee if is_present else 0))
+                if not isinstance(updates, list):
+                    return self.send_json({"error": "Dữ liệu cập nhật không hợp lệ"}, 400)
+                try:
+                    for u in updates:
+                        mid = u.get("matchId")
+                        pid = u.get("playerId")
+                        if not mid or not pid:
+                            continue
+                        added = float(u.get("addedDeposit", 0))
+                        fee = float(u.get("feeCharged", 0))
+                        if "isPresent" in u:
+                            is_present = 1 if u.get("isPresent") else 0
+                        else:
+                            is_present = 1 if fee > 0 else 0
+                        pitch_share = float(u.get("pitchShare", fee if is_present else 0))
 
-                    rec_id = f"rec-{mid}-{pid}"
-                    cur.execute("""
-                    INSERT INTO match_player_records (id, matchId, playerId, isPresent, hasDrinks, drinkAmount, pitchShare, feeCharged, addedDeposit, note, createdAt, updatedAt)
-                    VALUES (?, ?, ?, ?, 0, 0, ?, ?, ?, '', ?, ?)
-                    ON CONFLICT(matchId, playerId) DO UPDATE SET
-                        feeCharged = excluded.feeCharged,
-                        pitchShare = excluded.pitchShare,
-                        addedDeposit = excluded.addedDeposit,
-                        isPresent = excluded.isPresent,
-                        updatedAt = excluded.updatedAt
-                    """, (rec_id, mid, pid, is_present, pitch_share, fee, added, now, now))
-
-                conn.commit()
+                        rec_id = f"rec-{mid}-{pid}"
+                        cur.execute("""
+                        INSERT INTO match_player_records (id, matchId, playerId, isPresent, hasDrinks, drinkAmount, pitchShare, feeCharged, addedDeposit, note, createdAt, updatedAt)
+                        VALUES (?, ?, ?, ?, 0, 0, ?, ?, ?, '', ?, ?)
+                        ON CONFLICT(matchId, playerId) DO UPDATE SET
+                            feeCharged = excluded.feeCharged,
+                            pitchShare = excluded.pitchShare,
+                            addedDeposit = excluded.addedDeposit,
+                            isPresent = excluded.isPresent,
+                            updatedAt = excluded.updatedAt
+                        """, (rec_id, mid, pid, is_present, pitch_share, fee, added, now, now))
+                    conn.commit()
+                except (ValueError, TypeError, sqlite3.Error) as e:
+                    conn.rollback()
+                    return self.send_json({"error": f"Lưu thất bại, đã hoàn tác toàn bộ thay đổi: {e}"}, 400)
                 return self.send_json({"success": True, "count": len(updates)})
 
             elif path == "/api/reseed":
@@ -545,6 +620,9 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
 
             else:
                 return self.send_json({"error": "Not Found"}, 404)
+        except (KeyError, TypeError, ValueError, sqlite3.Error) as e:
+            conn.rollback()
+            return self.send_json({"error": f"Dữ liệu không hợp lệ hoặc lỗi xử lý, đã hoàn tác thay đổi: {e}"}, 400)
         finally:
             conn.close()
 
@@ -670,6 +748,9 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
 
             else:
                 return self.send_json({"error": "Not Found"}, 404)
+        except (KeyError, TypeError, ValueError, sqlite3.Error) as e:
+            conn.rollback()
+            return self.send_json({"error": f"Dữ liệu không hợp lệ hoặc lỗi xử lý, đã hoàn tác thay đổi: {e}"}, 400)
         finally:
             conn.close()
 
@@ -714,6 +795,8 @@ class FCRequestHandler(http.server.SimpleHTTPRequestHandler):
 def run():
     init_db()
     os.makedirs(PUBLIC_DIR, exist_ok=True)
+    if ADMIN_PASSWORD == DEFAULT_ADMIN_PASSWORD:
+        print("[CẢNH BÁO] Đang dùng mật khẩu Admin mặc định. Hãy đặt biến môi trường ADMIN_PASSWORD trước khi đưa lên mạng!")
     server_address = ("0.0.0.0", PORT)
     
     with ThreadingHTTPServer(server_address, FCRequestHandler) as httpd:
